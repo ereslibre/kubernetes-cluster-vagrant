@@ -8,7 +8,7 @@ source code into a cluster.
 It uses [Vagrant](https://www.vagrantup.com/) to create the different clusters,
 and allows you to have different cluster [profiles](profiles).
 
-The idea behind this project is to create a base image that downloads all the
+The idea behind this project is to create a base box that downloads all the
 required dependencies. This way, it's possible to completely remove network
 latency (or work completely offline if required) from your workflow.
 
@@ -22,9 +22,9 @@ if manual) can be of great help.
 * [Vagrant](https://www.vagrantup.com/)
 * Kubernetes cloned under `$GOPATH/src/k8s.io/kubernetes`
 
-## Base image
+## Base box
 
-The base image will contain some general images that will be used later when
+The base box will contain some general images that will be used later when
 creating the cluster. These images are defined in
 [`container_images.json`](base-box/configs/container_images.json). At the
 moment they are:
@@ -36,7 +36,7 @@ moment they are:
 
 Also, the following images inside
 `$GOPATH/src/k8s.io/kubernetes/_output/release-images/amd64` are also
-copied and loaded in the base image:
+copied and loaded in the base box:
 
 * `kube-apiserver`
 * `kube-controller-manager`
@@ -45,7 +45,7 @@ copied and loaded in the base image:
 
 Aside from that, the following packages inside
 `$GOPATH/src/k8s.io/kubernetes/bazel-bin/build/debs` are copied and
-installed in the base image too:
+installed in the base box too:
 
 * `cri-tools`
 * `kubeadm`
@@ -53,11 +53,10 @@ installed in the base image too:
 * `kubelet`
 * `kubernetes-cni`
 
-Building the base image requires internet connection for installing some
-packages and the first set of containers (the ones defined in
-`container_images.json`).
+Building the base box requires internet connection for installing some packages
+and the first set of containers (the ones defined in `container_images.json`).
 
-Once the base image is built, it is saved as a Vagrant box named
+Once the base box is built, it is saved as a Vagrant box named
 `kubernetes-vagrant`.
 
 ## Building a cluster
@@ -94,33 +93,9 @@ master    Ready     master    118s      v1.14.0-alpha.0.569+1e50c5711346e8-dirty
 worker    Ready     <none>    60s       v1.14.0-alpha.0.569+1e50c5711346e8-dirty
 ```
 
-## Deploying `kubeadm` to the cluster
+This will use all the versions of packages and components present in the base
+box, what might not be what you are looking for.
 
-Once that the cluster is running, you can build `kubeadm` on your machine and
-deploy it inside the cluster using `make kubeadm`.
-
-```
-~/p/kubernetes-cluster-vagrant (master) > env PROFILE=bootstrap/1-master-1-worker make kubeadm
-PACKAGES=kubeadm vagrant provision
-==> kubernetes_master: Running provisioner: file...
-==> kubernetes_master: Running provisioner: shell...
-    kubernetes_master: Running: inline script
-    kubernetes_master: (Reading database ... 60044 files and directories currently installed.)
-    kubernetes_master: Preparing to unpack .../vagrant/kubernetes/kubeadm.deb ...
-    kubernetes_master: Unpacking kubeadm (1.14.0~alpha.0.569+1e50c5711346e8) over (1.14.0~alpha.0.569+1e50c5711346e8) ...
-    kubernetes_master: Setting up kubeadm (1.14.0~alpha.0.569+1e50c5711346e8) ...
-==> kubernetes_worker: Running provisioner: file...
-==> kubernetes_worker: Running provisioner: shell...
-    kubernetes_worker: Running: inline script
-    kubernetes_worker: (Reading database ... 60044 files and directories currently installed.)
-    kubernetes_worker: Preparing to unpack .../vagrant/kubernetes/kubeadm.deb ...
-    kubernetes_worker: Unpacking kubeadm (1.14.0~alpha.0.569+1e50c5711346e8) over (1.14.0~alpha.0.569+1e50c5711346e8) ...
-    kubernetes_worker: Setting up kubeadm (1.14.0~alpha.0.569+1e50c5711346e8) ...
-```
-
-## Deploying other changes to the cluster
-
-`vagrant provision` can be used to deploy different things to the cluster.
 Everything that you want to deploy to the cluster can be controlled by
 environment variables. The currently supported ones are:
 
@@ -138,8 +113,28 @@ environment variables. The currently supported ones are:
 * `MANIFESTS`
   * `flannel`
 
-You can control what you want to deploy, and you can deploy several things at
-once, for example:
+It's possible to start the cluster and make it use your recently built component
+versions. You just need to provide what `PACKAGES`, `IMAGES` or `MANIFESTS`
+you want to be deployed when the cluster is created. For example:
+
+```
+~/p/kubernetes-cluster-vagrant (master) > env PROFILE=bootstrap/1-master-1-worker PACKAGES=kubeadm,kubelet make
+```
+
+In this case, it doesn't matter what versions of `kubeadm` and `kubelet`
+existed on the base box, the ones that you built on the host will be transferred
+to the different cluster machines and installed as soon as the machines are up.
+
+In the case that you are using a profile that is bootstrapping the cluster
+automatically, this bootstrap will happen after the new packages have overriden
+the old ones.
+
+## Deploying changes to the cluster while it's running
+
+`vagrant provision` can be used to deploy different things to the cluster. As
+with a regular `vagrant up` (or `make`), you can also use `PACKAGES`,
+`IMAGES` and `MANIFESTS` environment variables at will, to control what to
+deploy.
 
 ```
 ~/p/kubernetes-cluster-vagrant (master) > env PROFILE=bootstrap/1-master-1-worker PACKAGES=kubeadm,kubelet IMAGES=kube-apiserver,kube-scheduler vagrant provision
@@ -179,6 +174,10 @@ once, for example:
 
 ## Destroying the cluster
 
+You can destroy the cluster by pointing to the profile using the `PROFILE`
+environment variable and calling to `make clean`. This will also clean up your
+`~/.kube` folder on the host.
+
 ```
 ~/p/kubernetes-cluster-vagrant (master) > env PROFILE=bootstrap/1-master-1-worker make clean
 vagrant destroy -f
@@ -186,4 +185,24 @@ vagrant destroy -f
 ==> kubernetes_worker: Destroying VM and associated drives...
 ==> kubernetes_master: Forcing shutdown of VM...
 ==> kubernetes_master: Destroying VM and associated drives...
+```
+
+## License
+
+```
+kubernetes-cluster-vagrant
+Copyright (C) 2018 Rafael Fernández López <ereslibre@ereslibre.es>
+
+This program is free software: you can redistribute it and/or modify
+it under the terms of the GNU General Public License as published by
+the Free Software Foundation, either version 3 of the License, or
+(at your option) any later version.
+
+This program is distributed in the hope that it will be useful,
+but WITHOUT ANY WARRANTY; without even the implied warranty of
+MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+GNU General Public License for more details.
+
+You should have received a copy of the GNU General Public License
+along with this program.  If not, see <https://www.gnu.org/licenses/>.
 ```
