@@ -6,6 +6,7 @@ CLUSTER_SIZE = ENV["CLUSTER_SIZE"] || 3
 PACKAGES = %w(cri-tools kubeadm kubectl kubelet kubernetes-cni)
 IMAGES = %w(kube-apiserver kube-controller-manager kube-proxy kube-scheduler)
 EXTRA_IMAGES = %w(cloud-controller-manager conformance-amd64)
+MANIFESTS = %w(flannel)
 CONTAINER_IMAGES = JSON.parse File.read(File.join(File.dirname(__FILE__), '..', 'base-box', 'configs', 'container_images.json')), symbolize_names: true
 KUBERNETES_PATH = "#{ENV["GOPATH"]}/src/k8s.io/kubernetes"
 
@@ -110,11 +111,19 @@ def manifests_config_target_path(path)
 end
 
 def packages
-  (ENV["PACKAGES"] || "").split(",")
+  if ENV["PACKAGES"] == "all"
+    PACKAGES
+  else
+    (ENV["PACKAGES"] || "").split(",")
+  end
 end
 
 def images
-  (ENV["IMAGES"] || "").split(",")
+  if ENV["IMAGES"] == "all"
+    IMAGES
+  else
+    (ENV["IMAGES"] || "").split(",")
+  end
 end
 
 def default_manifests(cluster)
@@ -122,7 +131,11 @@ def default_manifests(cluster)
 end
 
 def manifests(cluster)
-  (ENV["MANIFESTS"] || default_manifests(cluster)).split(",")
+  if ENV["MANIFESTS"] == "all"
+    MANIFESTS
+  else
+    (ENV["MANIFESTS"] || default_manifests(cluster)).split(",")
+  end
 end
 
 def up?
