@@ -1,11 +1,6 @@
 # -*- mode: ruby -*-
 # vi: set ft=ruby :
 
-# Dependencies:
-#   - Kubernetes cloned into $GOPATH/src/k8s.io
-#   - bazel build //build/debs
-#   - KUBE_BUILD_HYPERKUBE=n make quick-release-images
-
 require File.join(File.dirname(__FILE__), 'vagrant', 'utils')
 
 check_profile
