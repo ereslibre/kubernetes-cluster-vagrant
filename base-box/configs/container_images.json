@@ -1,0 +1,22 @@
+{
+  "coredns": {
+    "repository": "k8s.gcr.io",
+    "name": "coredns",
+    "tag": "1.2.6"
+  },
+  "etcd": {
+    "repository": "k8s.gcr.io",
+    "name": "etcd",
+    "tag": "3.2.24"
+  },
+  "flannel": {
+    "repository": "quay.io",
+    "name": "coreos/flannel",
+    "tag": "v0.10.0-amd64"
+  },
+  "pause": {
+    "repository": "k8s.gcr.io",
+    "name": "pause",
+    "tag": "3.1"
+  }
+}

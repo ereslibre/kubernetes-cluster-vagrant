@@ -1,0 +1,19 @@
+{
+  "cluster": {
+    "name": "kubernetes",
+    "token": "5ynki1.3erp9i3yo7gqg1nv",
+    "bootstrap": true
+  },
+  "machines": [
+    {
+      "name": "master",
+      "role": "master",
+      "ip": "172.28.128.3"
+    },
+    {
+      "name": "worker",
+      "role": "worker",
+      "ip": "172.28.128.4"
+    }
+  ]
+}

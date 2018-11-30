@@ -1,0 +1,18 @@
+{
+  "cluster": {
+    "name": "kubernetes",
+    "bootstrap": false
+  },
+  "machines": [
+    {
+      "name": "master",
+      "role": "master",
+      "ip": "172.28.128.3"
+    },
+    {
+      "name": "worker",
+      "role": "worker",
+      "ip": "172.28.128.4"
+    }
+  ]
+}

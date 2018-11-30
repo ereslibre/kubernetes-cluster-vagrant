@@ -1,0 +1,10 @@
+<% packages.each do |package| %>
+  dpkg -i <%= kubernetes_target_path package %>.deb
+<% end %>
+
+<% images.each do |image| %>
+  docker load -i <%= kubernetes_target_path image %>.tar
+  docker tag k8s.gcr.io/<%= image %>:<%= full_kubernetes_version %> k8s.gcr.io/<%= image %>:<%= kubernetes_version %>
+<% end %>
+
+chmod -R +w <%= kubernetes_target_path %>
