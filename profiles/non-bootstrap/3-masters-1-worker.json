@@ -1,0 +1,33 @@
+{
+  "cluster": {
+    "name": "kubernetes_ha",
+    "bootstrap": false
+  },
+  "machines": [
+    {
+      "name": "lb",
+      "role": "loadbalancer",
+      "ip": "172.28.128.3"
+    },
+    {
+      "name": "master1",
+      "role": "master",
+      "ip": "172.28.128.4"
+    },
+    {
+      "name": "master2",
+      "role": "master",
+      "ip": "172.28.128.5"
+    },
+    {
+      "name": "master3",
+      "role": "master",
+      "ip": "172.28.128.6"
+    },
+    {
+      "name": "worker",
+      "role": "worker",
+      "ip": "172.28.128.7"
+    }
+  ]
+}

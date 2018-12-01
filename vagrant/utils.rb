@@ -185,6 +185,15 @@ def cluster
   $cluster = KubernetesCluster.new name: profile[:cluster][:name], token: profile[:cluster][:token], bootstrap: profile[:cluster][:bootstrap]
   $cluster.machines = profile[:machines].map do |machine|
     KubernetesMachine.new cluster: $cluster, name: machine[:name], role: machine[:role], ip: machine[:ip]
+  end.sort_by.with_index do |machine, i|
+    case machine.role
+    when "loadbalancer"
+      [0, i]
+    when "master"
+      [1, i]
+    when "worker"
+      [2, i]
+    end
   end
   $cluster
 end
