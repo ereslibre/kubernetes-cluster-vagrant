@@ -22,7 +22,7 @@ rm -rf <%= kubernetes_target_path %>
 
 # Cleanup base image
 apt-get clean
-dd if=/dev/zero of=/zeroes bs=1M
+dd if=/dev/zero of=/zeroes bs=1M &> /dev/null
 rm -f /zeroes
 
 exit 0
