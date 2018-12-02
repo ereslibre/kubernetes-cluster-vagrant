@@ -12,9 +12,9 @@ The idea behind this project is to create a base box that downloads all the
 required dependencies. This way, it's possible to completely remove network
 latency (or work completely offline if required) from your workflow.
 
-Unit and integration tests are important and can be very helpful for many cases,
-but when testing a tool like `kubeadm`, having a way to test your changes (even
-if manual) can be of great help.
+Both single master and multi master deployments are supported. In the multi
+master deployment case, a loadbalancer will be included in the profile, that
+will be the entry point to the api servers.
 
 ## Requirements
 
@@ -70,7 +70,7 @@ exists inside the [profiles](profiles) folder, or to a full path containing
 the profile you want.
 
 ```
-~/p/kubernetes-cluster-vagrant (master) > env PROFILE=bootstrap/1-master-1-worker make
+~/p/kubernetes-cluster-vagrant (master) > PROFILE=bootstrap/1-master-1-worker make
 make -C base-box
 make[1]: Entering directory '/home/ereslibre/projects/kubernetes-cluster-vagrant/base-box'
 >>> Base box (kubernetes-vagrant) already exists, skipping build
@@ -118,7 +118,7 @@ versions. You just need to provide what `PACKAGES`, `IMAGES` or `MANIFESTS`
 you want to be deployed when the cluster is created. For example:
 
 ```
-~/p/kubernetes-cluster-vagrant (master) > env PROFILE=bootstrap/1-master-1-worker PACKAGES=kubeadm,kubelet make
+~/p/kubernetes-cluster-vagrant (master) > PROFILE=bootstrap/1-master-1-worker PACKAGES=kubeadm,kubelet make
 ```
 
 In this case, it doesn't matter what versions of `kubeadm` and `kubelet`
@@ -137,7 +137,7 @@ with a regular `vagrant up` (or `make`), you can also use `PACKAGES`,
 deploy.
 
 ```
-~/p/kubernetes-cluster-vagrant (master) > env PROFILE=bootstrap/1-master-1-worker PACKAGES=kubeadm,kubelet IMAGES=kube-apiserver,kube-scheduler vagrant provision
+~/p/kubernetes-cluster-vagrant (master) > PROFILE=bootstrap/1-master-1-worker PACKAGES=kubeadm,kubelet IMAGES=kube-apiserver,kube-scheduler vagrant provision
 ==> kubernetes_master: Running provisioner: file...
 ==> kubernetes_master: Running provisioner: file...
 ==> kubernetes_master: Running provisioner: file...
@@ -172,6 +172,20 @@ deploy.
     kubernetes_worker: Loaded image: k8s.gcr.io/kube-scheduler:v1.14.0-alpha.0.569_1e50c5711346e8-dirty
 ```
 
+## HA deployments (multi master)
+
+Multi master deployments are supported, and are as simple as setting the correct
+profile. Example:
+
+```
+~/p/kubernetes-cluster-vagrant (master) > PROFILE=bootstrap/3-masters-1-worker make
+```
+
+This profile will create a load balancer (haproxy) that will be the entry point
+for all master nodes. The `kubeconfig` file that will get generated in your
+`$HOME/.kube/config` will include the reference to this load balancer IP
+address.
+
 ## Destroying the cluster
 
 You can destroy the cluster by pointing to the profile using the `PROFILE`
@@ -179,7 +193,7 @@ environment variable and calling to `make clean`. This will also clean up your
 `~/.kube` folder on the host.
 
 ```
-~/p/kubernetes-cluster-vagrant (master) > env PROFILE=bootstrap/1-master-1-worker make clean
+~/p/kubernetes-cluster-vagrant (master) > PROFILE=bootstrap/1-master-1-worker make clean
 vagrant destroy -f
 ==> kubernetes_worker: Forcing shutdown of VM...
 ==> kubernetes_worker: Destroying VM and associated drives...
