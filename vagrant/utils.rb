@@ -147,23 +147,23 @@ def provisioning?
 end
 
 def check_kubernetes
-  raise "Kubernetes not cloned under #{KUBERNETES_PATH}; please, run: `git clone git@github.com:kubernetes/kubernetes.git #{KUBERNETES_PATH}`" unless Dir.exists?(KUBERNETES_PATH)
+  raise "Kubernetes not cloned under #{KUBERNETES_PATH}; please, run `git clone git@github.com:kubernetes/kubernetes.git #{KUBERNETES_PATH}`" unless Dir.exists?(KUBERNETES_PATH)
 end
 
-def check_packages
+def check_packages(packages)
   missing_packages = Array.new
   packages.each do |package|
     missing_packages << package unless File.exists?(package_path(package))
   end
-  raise "Missing packages: #{missing_packages.join(", ")}; please, run: `bazel build //build/debs` from #{KUBERNETES_PATH}" unless missing_packages.empty?
+  raise "Missing packages: #{missing_packages.join(", ")}; please, run `bazel build //build/debs` from #{KUBERNETES_PATH}" unless missing_packages.empty?
 end
 
-def check_images
+def check_images(images)
   missing_images = Array.new
   images.each do |image|
     missing_images << image unless File.exists?(image_path(image))
   end
-  raise "Missing images: #{missing_images.join(", ")}; please, run: `KUBE_BUILD_HYPERKUBE=n make quick-release-images` from #{KUBERNETES_PATH}" unless missing_images.empty?
+  raise "Missing images: #{missing_images.join(", ")}; please, run `KUBE_BUILD_HYPERKUBE=n KUBE_BUILD_CONFORMANCE=n make quick-release-images` from #{KUBERNETES_PATH}" unless missing_images.empty?
 end
 
 def check_profile

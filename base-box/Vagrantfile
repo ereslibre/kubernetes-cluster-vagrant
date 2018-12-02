@@ -4,6 +4,12 @@
 require 'erb'
 require File.join(File.dirname(__FILE__), '..', 'vagrant', 'utils')
 
+if provisioning?
+  check_kubernetes
+  check_packages PACKAGES
+  check_images IMAGES
+end
+
 Vagrant.configure("2") do |config|
   config.vm.box = "ubuntu/bionic64"
 

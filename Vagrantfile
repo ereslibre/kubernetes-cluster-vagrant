@@ -7,8 +7,8 @@ check_profile
 
 if provisioning?
   check_kubernetes
-  check_packages
-  check_images
+  check_packages packages
+  check_images images
 end
 
 Vagrant.configure("2") do |config|
