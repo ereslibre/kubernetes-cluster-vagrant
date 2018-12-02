@@ -10,7 +10,10 @@ and allows you to have different cluster [profiles](profiles).
 
 The idea behind this project is to create a base box that downloads all the
 required dependencies. This way, it's possible to completely remove network
-latency (or work completely offline if required) from your workflow.
+latency (or work completely offline if required) from your workflow. Of course
+it's a goal to automate the whole process completely, allowing for the
+automation to be disabled in case you as a Kubernetes developer want to perform
+some steps manually.
 
 Both single master and multi master deployments are supported. In the multi
 master deployment case, a loadbalancer will be included in the profile, that
@@ -84,10 +87,10 @@ Bringing machine 'kubernetes_worker' up with 'virtualbox' provider...
 >>> kubeconfig written to /home/ereslibre/.kube/config
 ```
 
-After a minute or so:
+After a minute or so, you can execute from your host directly:
 
 ```
-~ > kubectl get nodes
+~/p/kubernetes-cluster-vagrant (master) > kubectl get nodes
 NAME      STATUS    ROLES     AGE       VERSION
 master    Ready     master    118s      v1.14.0-alpha.0.569+1e50c5711346e8-dirty
 worker    Ready     <none>    60s       v1.14.0-alpha.0.569+1e50c5711346e8-dirty
@@ -178,7 +181,51 @@ Multi master deployments are supported, and are as simple as setting the correct
 profile. Example:
 
 ```
-~/p/kubernetes-cluster-vagrant (master) > PROFILE=bootstrap/3-masters-1-worker make
+~/p/kubernetes-cluster-vagrant (master) > time PROFILE=bootstrap/3-masters-1-worker make
+
+<snip>
+
+>>> kubeconfig written to /home/ereslibre/.kube/config
+21.03user 11.47system 5:31.05elapsed 9%CPU (0avgtext+0avgdata 76264maxresident)k
+0inputs+1320outputs (0major+1679954minor)pagefaults 0swaps
+```
+
+From your host, now you can run:
+
+```
+~/p/kubernetes-cluster-vagrant (master) > kubectl get nodes
+NAME      STATUS    ROLES     AGE       VERSION
+master1   Ready     master    3m46s     v1.14.0-alpha.0.756+51453a31317118
+master2   Ready     master    2m40s     v1.14.0-alpha.0.756+51453a31317118
+master3   Ready     master    92s       v1.14.0-alpha.0.756+51453a31317118
+worker    Ready     <none>    26s       v1.14.0-alpha.0.756+51453a31317118
+```
+
+```
+~/p/kubernetes-cluster-vagrant (master) > kubectl get pods --all-namespaces -o wide
+NAMESPACE     NAME                              READY     STATUS    RESTARTS   AGE       IP           NODE      NOMINATED NODE   READINESS GATES
+kube-system   coredns-86c58d9df4-gj78t          1/1       Running   0          3m23s     10.244.0.2   master1   <none>           <none>
+kube-system   coredns-86c58d9df4-vvdm6          1/1       Running   0          3m23s     10.244.0.3   master1   <none>           <none>
+kube-system   etcd-master1                      1/1       Running   0          2m49s     10.0.2.15    master1   <none>           <none>
+kube-system   etcd-master2                      1/1       Running   0          2m38s     10.0.2.15    master2   <none>           <none>
+kube-system   etcd-master3                      1/1       Running   2          84s       10.0.2.15    master3   <none>           <none>
+kube-system   kube-apiserver-master1            1/1       Running   0          2m34s     10.0.2.15    master1   <none>           <none>
+kube-system   kube-apiserver-master2            1/1       Running   0          2m38s     10.0.2.15    master2   <none>           <none>
+kube-system   kube-apiserver-master3            1/1       Running   1          87s       10.0.2.15    master3   <none>           <none>
+kube-system   kube-controller-manager-master1   1/1       Running   0          2m38s     10.0.2.15    master1   <none>           <none>
+kube-system   kube-controller-manager-master2   1/1       Running   0          2m38s     10.0.2.15    master2   <none>           <none>
+kube-system   kube-controller-manager-master3   1/1       Running   0          85s       10.0.2.15    master3   <none>           <none>
+kube-system   kube-flannel-ds-amd64-7gv4p       1/1       Running   0          91s       10.0.2.15    master3   <none>           <none>
+kube-system   kube-flannel-ds-amd64-gj78r       1/1       Running   0          3m23s     10.0.2.15    master1   <none>           <none>
+kube-system   kube-flannel-ds-amd64-ljjjk       1/1       Running   1          2m38s     10.0.2.15    master2   <none>           <none>
+kube-system   kube-flannel-ds-amd64-vc9mn       1/1       Running   2          26s       10.0.2.15    worker    <none>           <none>
+kube-system   kube-proxy-6ffmq                  1/1       Running   0          91s       10.0.2.15    master3   <none>           <none>
+kube-system   kube-proxy-9wh8b                  1/1       Running   0          3m23s     10.0.2.15    master1   <none>           <none>
+kube-system   kube-proxy-p9hlr                  1/1       Running   0          2m38s     10.0.2.15    master2   <none>           <none>
+kube-system   kube-proxy-wm65p                  1/1       Running   0          26s       10.0.2.15    worker    <none>           <none>
+kube-system   kube-scheduler-master1            1/1       Running   0          2m43s     10.0.2.15    master1   <none>           <none>
+kube-system   kube-scheduler-master2            1/1       Running   0          2m38s     10.0.2.15    master2   <none>           <none>
+kube-system   kube-scheduler-master3            1/1       Running   0          86s       10.0.2.15    master3   <none>           <none>
 ```
 
 This profile will create a load balancer (haproxy) that will be the entry point
