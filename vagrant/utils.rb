@@ -28,6 +28,10 @@ class KubernetesCluster
     @machines.select { |machine| machine.master? }
   end
 
+  def cluster_machines
+    @machines.select { |machine| !machine.lb? }
+  end
+
   def ha?
     masters.length > 1
   end
@@ -198,7 +202,9 @@ def check_profile
 end
 
 def profile
-  $profile ||= JSON.parse File.read(File.exists?(ENV["PROFILE"]) ? ENV["PROFILE"] : "profiles/#{ENV["PROFILE"]}.json"), symbolize_names: true
+  return $profile if $profile
+  check_profile
+  $profile = JSON.parse File.read(File.exists?(ENV["PROFILE"]) ? ENV["PROFILE"] : "profiles/#{ENV["PROFILE"]}.json"), symbolize_names: true
 end
 
 def cluster

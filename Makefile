@@ -19,6 +19,11 @@ kubeconfig:
 	@vagrant ssh $(shell ruby -I vagrant -r utils -e 'print cluster.init_master.full_name') -c 'sudo cat /etc/kubernetes/admin.conf' > ~/.kube/config 2>/dev/null
 	@echo ">>> kubeconfig written to $(HOME)/.kube/config"
 
+.PHONY: reset
+reset:
+	@ruby -I vagrant -r utils -e 'print cluster.cluster_machines.map(&:full_name).join("\n")' | xargs -I{} vagrant ssh {} -c "sudo kubeadm reset -f"
+	@rm -rf ~/.kube
+
 .PHONY: destroy
 destroy:
 	vagrant destroy -f
