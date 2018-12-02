@@ -1,5 +1,14 @@
 # kubernetes-cluster-vagrant
 
+* [What](#what)
+* [Requirements](#requirements)
+* [Base box](#base-box)
+* [Building a cluster](#building-a-cluster)
+* [Deploying changes to the cluster while it's running](#deploying-changes-to-the-cluster-while-its-running)
+* [HA deployments (multi master)](#ha-deployments-multi-master)
+* [Destroying the cluster](#destroying-the-cluster)
+* [License](#license)
+
 ## What
 
 This project intends to make it very easy to push your changes to the Kubernetes
@@ -10,14 +19,21 @@ and allows you to have different cluster [profiles](profiles).
 
 The idea behind this project is to create a base box that downloads all the
 required dependencies. This way, it's possible to completely remove network
-latency (or work completely offline if required) from your workflow. Of course
-it's a goal to automate the whole process completely, allowing for the
+latency (or work completely offline if required) from your workflow.
+
+The idea is to also automate the whole process completely, allowing for the
 automation to be disabled in case you as a Kubernetes developer want to perform
 some steps manually.
 
+You can push your changes on the Kubernetes source code to the cluster when you
+are creating the cluster, or when it's already running.
+
 Both single master and multi master deployments are supported. In the multi
-master deployment case, a loadbalancer will be included in the profile, that
-will be the entry point to the api servers.
+master deployment case, a load balancer will be created in a separate machine.
+
+It's also possible to run several clusters at the same time, as long as they are
+different profiles and their cluster and/or machine names don't clash, as well
+as the IP addresses assigned to them.
 
 ## Requirements
 
@@ -57,10 +73,24 @@ installed in the base box too:
 * `kubernetes-cni`
 
 Building the base box requires internet connection for installing some packages
-and the first set of containers (the ones defined in `container_images.json`).
+and the first set of containers (the ones defined in
+[`container_images.json`](base-box/configs/container_images.json)).
 
 Once the base box is built, it is saved as a Vagrant box named
 `kubernetes-vagrant`.
+
+The idea behind the base box is that it contains everything needed to bring up
+a cluster in an offline environment, so if you are temporarily working on slow
+networks it won't affect your workflow.
+
+When you create a cluster, you can override whatever you want (e.g. `kubeadm`
+and `kubelet` packages), that will be installed on top of the ones included by
+the base box. This allows you to create clusters faster, only installing the
+packages you modified and checking the results.
+
+From time to time you'll need to rebuild the base box, but it's an action that
+you won't perform nearly as often as creating machines for testing your changes
+on the Kubernetes source code.
 
 ## Building a cluster
 
@@ -73,7 +103,7 @@ exists inside the [profiles](profiles) folder, or to a full path containing
 the profile you want.
 
 ```
-~/p/kubernetes-cluster-vagrant (master) > PROFILE=bootstrap/1-master-1-worker make
+~/p/kubernetes-cluster-vagrant (master) > time PROFILE=bootstrap/1-master-1-worker make
 make -C base-box
 make[1]: Entering directory '/home/ereslibre/projects/kubernetes-cluster-vagrant/base-box'
 >>> Base box (kubernetes-vagrant) already exists, skipping build
@@ -85,19 +115,24 @@ Bringing machine 'kubernetes_worker' up with 'virtualbox' provider...
 <snip>
 
 >>> kubeconfig written to /home/ereslibre/.kube/config
+9.30user 4.82system 2:14.49elapsed 10%CPU (0avgtext+0avgdata 64236maxresident)k
+0inputs+584outputs (0major+690067minor)pagefaults 0swaps
 ```
 
-After a minute or so, you can execute from your host directly:
+After a couple of minutes or so, you can execute from your host directly:
 
 ```
 ~/p/kubernetes-cluster-vagrant (master) > kubectl get nodes
 NAME      STATUS    ROLES     AGE       VERSION
-master    Ready     master    118s      v1.14.0-alpha.0.569+1e50c5711346e8-dirty
-worker    Ready     <none>    60s       v1.14.0-alpha.0.569+1e50c5711346e8-dirty
+master    Ready     master    74s       v1.14.0-alpha.0.756+51453a31317118
+worker    Ready     <none>    16s       v1.14.0-alpha.0.756+51453a31317118
 ```
 
 This will use all the versions of packages and components present in the base
-box, what might not be what you are looking for.
+box, what might not be what you are looking for, since your local changes to
+Kubernetes weren't pushed, because on the `make` command we didn't specify
+`PACKAGES`, `IMAGES` or `MANIFESTS` environment variables, so the ones from the
+base box were used.
 
 Everything that you want to deploy to the cluster can be controlled by
 environment variables. The currently supported ones are:
@@ -147,32 +182,32 @@ deploy.
 ==> kubernetes_master: Running provisioner: file...
 ==> kubernetes_master: Running provisioner: shell...
     kubernetes_master: Running: inline script
-    kubernetes_master: (Reading database ... 60044 files and directories currently installed.)
+    kubernetes_master: (Reading database ... 60170 files and directories currently installed.)
     kubernetes_master: Preparing to unpack .../vagrant/kubernetes/kubeadm.deb ...
-    kubernetes_master: Unpacking kubeadm (1.14.0~alpha.0.569+1e50c5711346e8) over (1.14.0~alpha.0.569+1e50c5711346e8) ...
-    kubernetes_master: Setting up kubeadm (1.14.0~alpha.0.569+1e50c5711346e8) ...
-    kubernetes_master: (Reading database ... 60044 files and directories currently installed.)
+    kubernetes_master: Unpacking kubeadm (1.14.0~alpha.0.756+51453a31317118) over (1.14.0~alpha.0.756+51453a31317118) ...
+    kubernetes_master: Setting up kubeadm (1.14.0~alpha.0.756+51453a31317118) ...
+    kubernetes_master: (Reading database ... 60170 files and directories currently installed.)
     kubernetes_master: Preparing to unpack .../vagrant/kubernetes/kubelet.deb ...
-    kubernetes_master: Unpacking kubelet (1.14.0~alpha.0.569+1e50c5711346e8) over (1.14.0~alpha.0.569+1e50c5711346e8) ...
-    kubernetes_master: Setting up kubelet (1.14.0~alpha.0.569+1e50c5711346e8) ...
-    kubernetes_master: Loaded image: k8s.gcr.io/kube-apiserver:v1.14.0-alpha.0.569_1e50c5711346e8-dirty
-    kubernetes_master: Loaded image: k8s.gcr.io/kube-scheduler:v1.14.0-alpha.0.569_1e50c5711346e8-dirty
+    kubernetes_master: Unpacking kubelet (1.14.0~alpha.0.756+51453a31317118) over (1.14.0~alpha.0.756+51453a31317118) ...
+    kubernetes_master: Setting up kubelet (1.14.0~alpha.0.756+51453a31317118) ...
+    kubernetes_master: Loaded image: k8s.gcr.io/kube-apiserver:v1.14.0-alpha.0.756_51453a31317118
+    kubernetes_master: Loaded image: k8s.gcr.io/kube-scheduler:v1.14.0-alpha.0.756_51453a31317118
 ==> kubernetes_worker: Running provisioner: file...
 ==> kubernetes_worker: Running provisioner: file...
 ==> kubernetes_worker: Running provisioner: file...
 ==> kubernetes_worker: Running provisioner: file...
 ==> kubernetes_worker: Running provisioner: shell...
     kubernetes_worker: Running: inline script
-    kubernetes_worker: (Reading database ... 60044 files and directories currently installed.)
+    kubernetes_worker: (Reading database ... 60170 files and directories currently installed.)
     kubernetes_worker: Preparing to unpack .../vagrant/kubernetes/kubeadm.deb ...
-    kubernetes_worker: Unpacking kubeadm (1.14.0~alpha.0.569+1e50c5711346e8) over (1.14.0~alpha.0.569+1e50c5711346e8) ...
-    kubernetes_worker: Setting up kubeadm (1.14.0~alpha.0.569+1e50c5711346e8) ...
-    kubernetes_worker: (Reading database ... 60044 files and directories currently installed.)
+    kubernetes_worker: Unpacking kubeadm (1.14.0~alpha.0.756+51453a31317118) over (1.14.0~alpha.0.756+51453a31317118) ...
+    kubernetes_worker: Setting up kubeadm (1.14.0~alpha.0.756+51453a31317118) ...
+    kubernetes_worker: (Reading database ... 60170 files and directories currently installed.)
     kubernetes_worker: Preparing to unpack .../vagrant/kubernetes/kubelet.deb ...
-    kubernetes_worker: Unpacking kubelet (1.14.0~alpha.0.569+1e50c5711346e8) over (1.14.0~alpha.0.569+1e50c5711346e8) ...
-    kubernetes_worker: Setting up kubelet (1.14.0~alpha.0.569+1e50c5711346e8) ...
-    kubernetes_worker: Loaded image: k8s.gcr.io/kube-apiserver:v1.14.0-alpha.0.569_1e50c5711346e8-dirty
-    kubernetes_worker: Loaded image: k8s.gcr.io/kube-scheduler:v1.14.0-alpha.0.569_1e50c5711346e8-dirty
+    kubernetes_worker: Unpacking kubelet (1.14.0~alpha.0.756+51453a31317118) over (1.14.0~alpha.0.756+51453a31317118) ...
+    kubernetes_worker: Setting up kubelet (1.14.0~alpha.0.756+51453a31317118) ...
+    kubernetes_worker: Loaded image: k8s.gcr.io/kube-apiserver:v1.14.0-alpha.0.756_51453a31317118
+    kubernetes_worker: Loaded image: k8s.gcr.io/kube-scheduler:v1.14.0-alpha.0.756_51453a31317118
 ```
 
 ## HA deployments (multi master)
@@ -228,8 +263,8 @@ kube-system   kube-scheduler-master2            1/1       Running   0          2
 kube-system   kube-scheduler-master3            1/1       Running   0          86s       10.0.2.15    master3   <none>           <none>
 ```
 
-This profile will create a load balancer (haproxy) that will be the entry point
-for all master nodes. The `kubeconfig` file that will get generated in your
+A load balancer (haproxy) will be created, what will be the entry point for all
+master node apiservers. The `kubeconfig` file that will get generated in your
 `$HOME/.kube/config` will include the reference to this load balancer IP
 address.
 
