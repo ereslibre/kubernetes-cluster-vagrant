@@ -1,0 +1,25 @@
+global
+  log /dev/log local0
+  log /dev/log local1 notice
+  chroot /var/lib/haproxy
+  user haproxy
+  group haproxy
+  daemon
+
+defaults
+  log global
+  mode tcp
+  option dontlognull
+  timeout connect 5000
+  timeout client 50000
+  timeout server 50000
+
+frontend apiserver
+  bind 0.0.0.0:6443
+  default_backend apiserver-backend
+
+backend apiserver-backend
+  option httpchk GET /healthz
+<% cluster.masters.each do |master| %>
+  server <%= master.name %> <%= master.ip %>:6443 check check-ssl verify none
+<% end %>

@@ -5,7 +5,7 @@ add-apt-repository "deb [arch=amd64] https://download.docker.com/linux/ubuntu $(
 apt-get update
 apt-get install -y docker-ce
 usermod -aG docker vagrant
-apt-get install -y socat ebtables
+apt-get install -y socat ebtables haproxy
 
 dpkg -i <%= kubernetes_target_path %>/{<%= PACKAGES.join(",") %>}.deb
 <% IMAGES.each do |image| %>
@@ -19,6 +19,9 @@ dpkg -i <%= kubernetes_target_path %>/{<%= PACKAGES.join(",") %>}.deb
 <% end %>
 
 rm -rf <%= kubernetes_target_path %>
+
+# Disable some services by default
+systemctl disable --now haproxy
 
 # Cleanup base image
 apt-get clean

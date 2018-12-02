@@ -5,7 +5,6 @@ require 'tempfile'
 CLUSTER_SIZE = ENV["CLUSTER_SIZE"] || 3
 PACKAGES = %w(cri-tools kubeadm kubectl kubelet kubernetes-cni)
 IMAGES = %w(kube-apiserver kube-controller-manager kube-proxy kube-scheduler)
-EXTRA_IMAGES = %w(cloud-controller-manager conformance-amd64)
 MANIFESTS = %w(flannel)
 CONTAINER_IMAGES = JSON.parse File.read(File.join(File.dirname(__FILE__), '..', 'base-box', 'configs', 'container_images.json')), symbolize_names: true
 KUBERNETES_PATH = "#{ENV["GOPATH"]}/src/k8s.io/kubernetes"
@@ -21,8 +20,16 @@ class KubernetesCluster
     masters.first
   end
 
+  def lb
+    @machines.find { |machine| machine.lb? }
+  end
+
   def masters
     @machines.select { |machine| machine.master? }
+  end
+
+  def ha?
+    masters.length > 1
   end
 end
 
@@ -34,8 +41,16 @@ class KubernetesMachine
     @cluster, @name, @role, @ip = cluster, name, role, ip
   end
 
+  def lb?
+    @role == "loadbalancer"
+  end
+
   def master?
     @role == "master"
+  end
+
+  def worker?
+    @role == "worker"
   end
 
   def init_master?
@@ -44,6 +59,12 @@ class KubernetesMachine
 
   def full_name
     "#{@cluster.name}_#{@name}"
+  end
+
+  def etcd_initial_cluster_endpoints
+    (@cluster.masters.take_while { |master| master != self } + [self]).map do |m|
+      "#{m.name}=https://#{m.ip}:2380"
+    end.join(",")
   end
 end
 
@@ -79,7 +100,7 @@ def full_kubernetes_version
 end
 
 def kubernetes_version
-  File.read(kubernetes_path(".dockerized-kube-version-defs")) =~ /^KUBE_GIT_VERSION='([^-]+)/
+  full_kubernetes_version =~ /^([^-]+)/
   $1
 end
 

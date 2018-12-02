@@ -1,14 +1,34 @@
 mkdir -p $HOME/.kube
 
-<% if machine.init_master? %>
+<% if cluster.ha? && !machine.init_master? && machine.master? %>
+  sudo mkdir -p /etc/kubernetes
+  sudo mv /tmp/kubernetes/* /etc/kubernetes
+<% end %>
+
+<% if machine.master? %>
   sudo kubeadm init --config kubeadm/config/default.config
   sudo cp -i /etc/kubernetes/admin.conf $HOME/.kube/config
-<% else %>
+<% elsif machine.worker? %>
   sudo kubeadm join <%= cluster.init_master.ip %>:6443 --token <%= cluster.token %> --discovery-token-unsafe-skip-ca-verification
   sudo cp -i /etc/kubernetes/kubelet.conf $HOME/.kube/config
 <% end %>
 
 sudo chown $(id -u):$(id -g) $HOME/.kube/config
+
+<% if !machine.init_master? && machine.master? %>
+  while ! kubectl exec -n kube-system etcd-<%= cluster.init_master.name %> -- etcdctl --ca-file /etc/kubernetes/pki/etcd/ca.crt --cert-file /etc/kubernetes/pki/etcd/peer.crt --key-file /etc/kubernetes/pki/etcd/peer.key --endpoints=https://<%= cluster.init_master.ip %>:2379 member add <%= machine.name %> https://<%= machine.ip %>:2380 &> /dev/null; do
+    sleep 1
+  done
+<% end %>
+
+<% if cluster.ha? && machine.init_master? %>
+  mkdir -p /vagrant/pki/etcd
+  sudo cp /etc/kubernetes/pki/{ca,front-proxy-ca}.crt /vagrant/pki
+  sudo cp /etc/kubernetes/pki/{ca,sa,front-proxy-ca}.key /vagrant/pki
+  sudo cp /etc/kubernetes/pki/sa.pub /vagrant/pki
+  sudo cp /etc/kubernetes/pki/etcd/ca.{crt,key} /vagrant/pki/etcd
+  sudo cp /etc/kubernetes/admin.conf /vagrant
+<% end %>
 
 <% if machine.init_master? %>
   kubectl apply -f manifests/flannel.yaml
