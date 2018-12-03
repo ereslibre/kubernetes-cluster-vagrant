@@ -65,6 +65,10 @@ class KubernetesMachine
     "#{@cluster.name}_#{@name}"
   end
 
+  def ip_regex
+    @ip.gsub '.', '\.'
+  end
+
   def etcd_initial_cluster_endpoints
     (@cluster.masters.take_while { |master| master != self } + [self]).map do |m|
       "#{m.name}=https://#{m.ip}:2380"
