@@ -22,8 +22,8 @@ controlPlaneEndpoint: <%= cluster.lb.ip %>:6443
 <% end %>
 networking:
   dnsDomain: cluster.local
-  podSubnet: 10.244.0.0/16
-  serviceSubnet: 10.96.0.0/12
+  podSubnet: <%= cluster.network.pod_subnet %>
+  serviceSubnet: <%= cluster.network.service_subnet %>
 dns:
   imageRepository: <%= CONTAINER_IMAGES[:coredns][:repository] %>
   imageTag: <%= CONTAINER_IMAGES[:coredns][:tag] %>

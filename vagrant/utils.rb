@@ -9,8 +9,16 @@ MANIFESTS = %w(flannel)
 CONTAINER_IMAGES = JSON.parse File.read(File.join(File.dirname(__FILE__), '..', 'base-box', 'configs', 'container_images.json')), symbolize_names: true
 KUBERNETES_PATH = "#{ENV["GOPATH"]}/src/k8s.io/kubernetes"
 
+class KubernetesNetwork
+  attr_accessor :pod_subnet, :service_subnet
+
+  def initialize(pod_subnet:, service_subnet:)
+    @pod_subnet, @service_subnet = pod_subnet, service_subnet
+  end
+end
+
 class KubernetesCluster
-  attr_accessor :name, :token, :bootstrap, :machines
+  attr_accessor :name, :token, :bootstrap, :machines, :network
 
   def initialize(name:, token:, bootstrap:)
     @name, @token, @bootstrap = name, token, bootstrap
@@ -63,10 +71,6 @@ class KubernetesMachine
 
   def full_name
     "#{@cluster.name}_#{@name}"
-  end
-
-  def ip_regex
-    @ip.gsub '.', '\.'
   end
 
   def etcd_initial_cluster_endpoints
@@ -214,6 +218,8 @@ end
 def cluster
   return $cluster if $cluster
   $cluster = KubernetesCluster.new name: profile[:cluster][:name], token: profile[:cluster][:token], bootstrap: profile[:cluster][:bootstrap]
+  $cluster.network = KubernetesNetwork.new pod_subnet: profile[:cluster][:network][:pod_subnet],
+                                           service_subnet: profile[:cluster][:network][:service_subnet]
   $cluster.machines = profile[:machines].map do |machine|
     KubernetesMachine.new cluster: $cluster, name: machine[:name], role: machine[:role], ip: machine[:ip]
   end.sort_by.with_index do |machine, i|

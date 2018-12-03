@@ -73,7 +73,7 @@ data:
     }
   net-conf.json: |
     {
-      "Network": "10.244.0.0/16",
+      "Network": "<%= cluster.network.pod_subnet %>",
       "Backend": {
         "Type": "vxlan"
       }
@@ -123,7 +123,7 @@ spec:
         args:
         - --ip-masq
         - --kube-subnet-mgr
-        - --iface-regex=<%= cluster.machines.map(&:ip_regex).join "|" %>
+        - --iface-regex=<%= cluster.machines.map(&:ip).map { |ip| ip.gsub '.', '\.' }.join "|" %>
         resources:
           requests:
             cpu: "100m"

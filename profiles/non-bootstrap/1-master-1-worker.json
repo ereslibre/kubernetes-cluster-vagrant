@@ -1,6 +1,10 @@
 {
   "cluster": {
     "name": "kubernetes",
+    "network": {
+      "pod_subnet": "10.244.0.0/16",
+      "service_subnet": "10.96.0.0/12"
+    },
     "bootstrap": false
   },
   "machines": [
