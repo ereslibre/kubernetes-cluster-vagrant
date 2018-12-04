@@ -36,6 +36,7 @@ Vagrant.configure("2") do |config|
       vm_config.vm.provider "virtualbox" do |vb|
         vb.customize ["modifyvm", :id, "--audio", "none"]
         vb.customize ["modifyvm", :id, "--uartmode1", "disconnected"]
+        vb.linked_clone = true
       end
 
       case machine.role
