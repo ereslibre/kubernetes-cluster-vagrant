@@ -30,4 +30,5 @@ destroy:
 
 .PHONY: clean
 clean: destroy
+	@ruby -I vagrant -r utils -e 'print cluster.name' | xargs -I{} rm -rf tmp/{}
 	@rm -rf ~/.kube
