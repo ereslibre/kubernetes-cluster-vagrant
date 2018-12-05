@@ -46,9 +46,9 @@ shell: run
 .PHONY: destroy
 destroy:
 	@vagrant destroy -f &> /dev/null || true
+	@ruby -I vagrant -r utils -e 'print cluster.name' 2> /dev/null | xargs -I{} rm -rf tmp/{} || true
+	@rm -rf ~/.kube &> /dev/null || true
 
 .PHONY: clean
 clean: destroy
 	@docker rm -f kubernetes-build &> /dev/null || true
-	@ruby -I vagrant -r utils -e 'print cluster.name' 2> /dev/null | xargs -I{} rm -rf tmp/{} || true
-	@rm -rf ~/.kube &> /dev/null || true
