@@ -1,5 +1,4 @@
 KUBEPATH = $(GOPATH)/src/k8s.io/kubernetes
-KUBERNETES_BUILD = docker exec -w $(KUBEPATH) -it $(shell docker ps --filter=name=kubernetes-build -q) bazel build
 KUBERNETES_BUILD_CONTAINER = docker ps --filter=name=kubernetes-build -q
 
 .PHONY: all
@@ -31,11 +30,14 @@ run:
 
 .PHONY: debs
 debs: run
-	@$(KUBERNETES_BUILD) //build/debs
+	docker exec -it $(shell $(KUBERNETES_BUILD_CONTAINER)) su -c "cd $(KUBEPATH) && bazel build //build/debs" - $(shell id -u -n)
 
 .PHONY: images
 images: run
-	@$(KUBERNETES_BUILD) //build:docker-artifacts
+	docker exec -it $(shell $(KUBERNETES_BUILD_CONTAINER)) su -c "cd $(KUBEPATH) && bazel build //build:docker-artifacts" - $(shell id -u -n)
+
+.PHONY: artifacts
+artifacts: debs images
 
 .PHONY: shell
 shell: run
