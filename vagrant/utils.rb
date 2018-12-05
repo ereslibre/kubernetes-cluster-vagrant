@@ -103,7 +103,7 @@ def package_path(package)
 end
 
 def image_path(image)
-  kubernetes_path "_output/release-images/amd64/#{image}.tar"
+  kubernetes_path "bazel-bin/build/#{image}.tar"
 end
 
 def full_kubernetes_version
@@ -188,7 +188,7 @@ def check_packages(packages)
   packages.each do |package|
     missing_packages << package unless File.exists?(package_path(package))
   end
-  raise "Missing packages: #{missing_packages.join(", ")}; please, run `bazel build //build/debs` from #{KUBERNETES_PATH}" unless missing_packages.empty?
+  raise "Missing packages: #{missing_packages.join(", ")}; please, run `bazel build //build/debs` from #{KUBERNETES_PATH} or `make debs` from here" unless missing_packages.empty?
 end
 
 def check_images(images)
@@ -196,7 +196,7 @@ def check_images(images)
   images.each do |image|
     missing_images << image unless File.exists?(image_path(image))
   end
-  raise "Missing images: #{missing_images.join(", ")}; please, run `KUBE_BUILD_HYPERKUBE=n KUBE_BUILD_CONFORMANCE=n make quick-release-images` from #{KUBERNETES_PATH}" unless missing_images.empty?
+  raise "Missing images: #{missing_images.join(", ")}; please, run `bazel build //build:docker-artifacts` from #{KUBERNETES_PATH} or `make images` from here" unless missing_images.empty?
 end
 
 def check_profile
