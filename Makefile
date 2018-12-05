@@ -1,3 +1,7 @@
+KUBEPATH = $(GOPATH)/src/k8s.io/kubernetes
+KUBERNETES_BUILD = docker exec -w $(KUBEPATH) -it $(shell docker ps --filter=name=kubernetes-build -q) bazel build
+KUBERNETES_BUILD_CONTAINER = docker ps --filter=name=kubernetes-build -q
+
 .PHONY: all
 all: up kubeconfig
 
@@ -8,10 +12,6 @@ base-box:
 .PHONY: up
 up: base-box
 	vagrant up
-
-.PHONY: kubeadm
-kubeadm:
-	PACKAGES=kubeadm vagrant provision
 
 .PHONY: kubeconfig
 kubeconfig:
@@ -24,11 +24,29 @@ reset:
 	@ruby -I vagrant -r utils -e 'print cluster.cluster_machines.map(&:full_name).join("\n")' | xargs -I{} vagrant ssh {} -c "sudo kubeadm reset -f"
 	@rm -rf ~/.kube
 
+.PHONY: run
+run:
+	$(MAKE) -C kubernetes-build
+	-@kubernetes-build/scripts/start-container.sh &> /dev/null
+
+.PHONY: debs
+debs: run
+	@$(KUBERNETES_BUILD) //build/debs
+
+.PHONY: images
+images: run
+	@$(KUBERNETES_BUILD) //build:docker-artifacts
+
+.PHONY: shell
+shell: run
+	docker exec -it $(shell $(KUBERNETES_BUILD_CONTAINER)) su -c "cd $(KUBEPATH) && bash" - $(shell id -u -n)
+
 .PHONY: destroy
 destroy:
-	vagrant destroy -f
+	@vagrant destroy -f &> /dev/null || true
 
 .PHONY: clean
 clean: destroy
-	@ruby -I vagrant -r utils -e 'print cluster.name' | xargs -I{} rm -rf tmp/{}
-	@rm -rf ~/.kube
+	@docker rm -f kubernetes-build &> /dev/null || true
+	@ruby -I vagrant -r utils -e 'print cluster.name' 2> /dev/null | xargs -I{} rm -rf tmp/{} || true
+	@rm -rf ~/.kube &> /dev/null || true
