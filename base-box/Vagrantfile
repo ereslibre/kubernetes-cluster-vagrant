@@ -24,7 +24,7 @@ Vagrant.configure("2") do |config|
   end
 
   IMAGES.each do |image|
-    config.vm.provision :file, source: kubernetes_path("_output/release-images/amd64/#{image}.tar"), destination: kubernetes_target_path("#{image}.tar")
+    config.vm.provision :file, source: kubernetes_path("bazel-bin/build/#{image}.tar"), destination: kubernetes_target_path("#{image}.tar")
   end
 
   config.vm.provision :shell, inline: template("scripts/install.erb", binding)
