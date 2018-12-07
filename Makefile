@@ -51,4 +51,4 @@ destroy:
 
 .PHONY: clean
 clean: destroy
-	@docker rm -f kubernetes-build &> /dev/null || true
+	@docker rm -f -v kubernetes-build &> /dev/null || true
