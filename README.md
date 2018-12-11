@@ -95,8 +95,8 @@ moment they are:
 * `pause`
 
 Also, the following images inside
-`$GOPATH/src/k8s.io/kubernetes/_output/release-images/amd64` are also
-copied and loaded in the base box:
+`$GOPATH/src/k8s.io/kubernetes/bazel-bin/build` (created manually or by running
+`make images` within this project) are also copied and loaded in the base box:
 
 * `kube-apiserver`
 * `kube-controller-manager`
@@ -104,8 +104,9 @@ copied and loaded in the base box:
 * `kube-scheduler`
 
 Aside from that, the following packages inside
-`$GOPATH/src/k8s.io/kubernetes/bazel-bin/build/debs` are copied and
-installed in the base box too:
+`$GOPATH/src/k8s.io/kubernetes/bazel-bin/build/debs` (created manually or by
+running `make debs` within this project) are copied and installed in the base
+box too:
 
 * `cri-tools`
 * `kubeadm`
@@ -323,6 +324,13 @@ vagrant destroy -f
 ==> kubernetes_master: Forcing shutdown of VM...
 ==> kubernetes_master: Destroying VM and associated drives...
 ```
+
+In case you also ran `make images`, `make debs` or `make artifacts`,
+`make clean` will also remove the docker container created to build kubernetes
+artifacts.
+
+If you want to destroy the cluster, but keep the docker container for building
+Kubernetes artifacts faster, you can run `make destroy`.
 
 ## License
 
