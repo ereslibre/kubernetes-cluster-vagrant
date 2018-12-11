@@ -23,7 +23,7 @@ Vagrant.configure("2") do |config|
 
       vm_config.vm.hostname = machine.name
 
-      vm_config.vm.network :private_network, ip: machine.ip
+      vm_config.vm.network "private_network", ip: machine.ip
 
       # On the "init master" machine, mount `/vagrant`, so we can transfer the
       # secrets for the HA clusters to the remaining masters.
