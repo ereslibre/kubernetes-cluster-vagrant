@@ -1,0 +1,33 @@
+{
+    "cluster": {
+      "name": "kubernetes_multiworker",
+      "token": "5ynki1.3erp9i3yo7gqg1nv",
+      "network": {
+        "pod_subnet": "10.244.0.0/16",
+        "service_subnet": "10.96.0.0/12"
+      },
+      "bootstrap": false
+    },
+    "machines": [
+      {
+        "name": "master",
+        "role": "master",
+        "ip": "172.28.128.3"
+      },
+      {
+        "name": "worker1",
+        "role": "worker",
+        "ip": "172.28.128.4"
+      },
+      {
+        "name": "worker2",
+        "role": "worker",
+        "ip": "172.28.128.5"
+      },
+      {
+        "name": "worker3",
+        "role": "worker",
+        "ip": "172.28.128.6"
+      }
+    ]
+  }
