@@ -64,8 +64,10 @@ Vagrant.configure("2") do |config|
         end
 
         # Install specific manifests if provided
-        manifests(cluster).each do |manifest|
-          vm_config.vm.provision :file, source: template_file("manifests/#{manifest}.yaml.erb", binding), destination: manifests_config_target_path("#{manifest}.yaml")
+        if machine.init_master?
+          manifests(cluster).each do |manifest|
+            vm_config.vm.provision :file, source: template_file("manifests/#{manifest}.yaml.erb", binding), destination: manifests_config_target_path("#{manifest}.yaml")
+          end
         end
 
         if machine.master? && up?
