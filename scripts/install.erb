@@ -4,7 +4,7 @@
 
 <% images.each do |image| %>
   docker load -i <%= kubernetes_target_path image %>.tar
-  docker tag k8s.gcr.io/<%= image %>:<%= full_kubernetes_version %> k8s.gcr.io/<%= image %>:<%= kubernetes_version %>
+  docker tag k8s.gcr.io/<%= image %>:<%= full_image_version image %> k8s.gcr.io/<%= image %>:<%= image_version image %>
 <% end %>
 
 chmod -R +w <%= kubernetes_target_path %>

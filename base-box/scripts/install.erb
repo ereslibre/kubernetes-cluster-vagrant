@@ -10,7 +10,7 @@ apt-get install -y conntrack socat ebtables haproxy
 dpkg -i <%= kubernetes_target_path %>/{<%= PACKAGES.join(",") %>}.deb
 <% IMAGES.each do |image| %>
   docker load -i <%= kubernetes_target_path image %>.tar
-  docker tag k8s.gcr.io/<%= image %>:<%= full_kubernetes_version %> k8s.gcr.io/<%= image %>:<%= kubernetes_version %>
+  docker tag k8s.gcr.io/<%= image %>:<%= full_image_version image %> k8s.gcr.io/<%= image %>:<%= image_version image %>
 <% end %>
 
 # Pull container images that will be used

@@ -106,14 +106,22 @@ def image_path(image)
   kubernetes_path "bazel-bin/build/#{image}.tar"
 end
 
+def full_image_version(image)
+  File.read(kubernetes_path("bazel-genfiles/build/#{image}.docker_tag")).strip
+end
+
+def image_version(image)
+  full_image_version(image) =~ /^([^-]+)/
+  $1
+end
+
 def full_kubernetes_version
-  File.read(kubernetes_path(".dockerized-kube-version-defs")) =~ /^KUBE_GIT_VERSION='([^']+)'$/
-  $1.gsub("+", "_")
+  File.read(kubernetes_path("bazel-genfiles/build/version")).strip
 end
 
 def kubernetes_version
-  full_kubernetes_version =~ /^([^-]+)/
-  $1
+  full_kubernetes_version =~ /^((?:\d+\.){2}\d+)/
+  "v#{$1}"
 end
 
 def kubernetes_target_path(path = nil)
