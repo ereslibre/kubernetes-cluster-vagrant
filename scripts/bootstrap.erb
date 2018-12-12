@@ -1,12 +1,14 @@
 mkdir -p $HOME/.kube
 
+sudo systemctl enable kubelet
+
 <% if cluster.ha? && !machine.init_master? && machine.master? %>
   sudo mkdir -p /etc/kubernetes
   sudo mv /tmp/kubernetes/* /etc/kubernetes
 <% end %>
 
 <% if machine.master? %>
-  sudo kubeadm init --config kubeadm/config/default.config
+  sudo kubeadm init --config <%= kubeadm_config_target_path "kubeadm.config" %>
   sudo cp /etc/kubernetes/admin.conf $HOME/.kube/config
 <% elsif machine.worker? %>
   sudo kubeadm join <%= cluster.init_master.ip %>:6443 --token <%= cluster.token %> --discovery-token-unsafe-skip-ca-verification
@@ -31,5 +33,5 @@ sudo chown $(id -u):$(id -g) $HOME/.kube/config
 <% end %>
 
 <% if machine.init_master? %>
-  kubectl apply -f manifests/flannel.yaml
+  kubectl apply -f <%= manifests_config_target_path "flannel.yaml" %>
 <% end %>

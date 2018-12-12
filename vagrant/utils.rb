@@ -144,7 +144,7 @@ def template(config, b)
 end
 
 def kubeadm_config_target_path(path)
-  "/home/vagrant/kubeadm/config/#{path}"
+  "/home/vagrant/kubeadm/#{path}"
 end
 
 def manifests_config_target_path(path)

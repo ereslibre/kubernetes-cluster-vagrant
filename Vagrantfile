@@ -71,7 +71,7 @@ Vagrant.configure("2") do |config|
         end
 
         if machine.master? && up?
-          vm_config.vm.provision :file, source: template_file("configs/default.config.erb", binding), destination: kubeadm_config_target_path("default.config")
+          vm_config.vm.provision :file, source: template_file("configs/kubeadm.config.erb", binding), destination: kubeadm_config_target_path("kubeadm.config")
         end
 
         if cluster.bootstrap && up?

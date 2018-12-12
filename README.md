@@ -7,6 +7,7 @@
 * [Building a cluster](#building-a-cluster)
 * [Deploying changes to the cluster while it's running](#deploying-changes-to-the-cluster-while-its-running)
 * [HA deployments (multi master)](#ha-deployments-multi-master)
+* [SSH'ing into the machines](#sshing-into-the-machines)
 * [Destroying the cluster](#destroying-the-cluster)
 * [License](#license)
 
@@ -309,6 +310,30 @@ A load balancer (haproxy) will be created, what will be the entry point for all
 master node apiservers. The `kubeconfig` file that will get generated in your
 `$HOME/.kube/config` will include the reference to this load balancer IP
 address.
+
+## SSH'ing into the machines
+
+You can use `vagrant ssh` normally, but you need to point to the `PROFILE` in
+order to refer into what machine you want to SSH into. If you have created a
+cluster with, say:
+
+```
+~/p/kubernetes-cluster-vagrant (master) > PROFILE=bootstrap/1-master-1-worker make
+```
+
+Then, you can ssh into two machines, named: `master` or `worker`, as the
+profile shows. So, you can do:
+
+```
+~/p/kubernetes-cluster-vagrant (master) > PROFILE=bootstrap/1-master-1-worker vagrant ssh kubernetes_master
+```
+
+```
+~/p/kubernetes-cluster-vagrant (master) > PROFILE=bootstrap/1-master-1-worker vagrant ssh kubernetes_worker
+```
+
+Take into account that the prefix is the name of the cluster also present in the
+`PROFILE` file.
 
 ## Destroying the cluster
 

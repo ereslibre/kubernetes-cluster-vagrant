@@ -26,9 +26,7 @@ rm -rf <%= kubernetes_target_path %>
 
 # Disable some services by default
 systemctl disable --now haproxy
-
-# Enable some services by default
-systemctl enable kubelet
+systemctl disable --now kubelet
 
 # Cleanup base image
 apt-get clean
