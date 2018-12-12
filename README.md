@@ -2,6 +2,7 @@
 
 * [What](#what)
 * [Requirements](#requirements)
+* [Quick start](#quick-start)
 * [Building Kubernetes artifacts](#building-kubernetes-artifacts)
 * [Base box](#base-box)
 * [Building a cluster](#building-a-cluster)
@@ -42,6 +43,48 @@ as the IP addresses assigned to them.
 * [Virtualbox](https://www.virtualbox.org/)
 * [Vagrant](https://www.vagrantup.com/)
 * Kubernetes cloned under `$GOPATH/src/k8s.io/kubernetes`
+
+## Quick start
+
+You only need to have cloned Kubernetes in your $GOPATH in your host. The path
+should be `$GOPATH/src/k8s.io/kubernetes`. Let's create the Kubernetes
+artifacts first:
+
+```
+~/p/kubernetes-cluster-vagrant (master) > make artifacts
+
+<snip>
+
+INFO: Elapsed time: 68.716s, Critical Path: 38.72s
+INFO: 60 processes: 60 processwrapper-sandbox.
+INFO: Build completed successfully, 61 total actions
+```
+
+Now let's create a 1 master and 1 worker cluster:
+
+```
+~/p/kubernetes-cluster-vagrant (master) > PROFILE=bootstrap/1-master-1-worker make
+
+<snip>
+
+>>> kubeconfig written to /home/ereslibre/.kube/config
+```
+
+Now you can execute from your host directly:
+
+```
+~/p/kubernetes-cluster-vagrant (master) > kubectl get nodes
+NAME      STATUS    ROLES     AGE       VERSION
+master    Ready     master    79s       v1.14.0-alpha.0.974+f89aa180476882
+worker    Ready     <none>    41s       v1.14.0-alpha.0.974+f89aa180476882
+```
+
+Now, let's clean the cluster machines and the container used for building the
+Kubernetes artifacts:
+
+```
+~/p/kubernetes-cluster-vagrant (master) > PROFILE=bootstrap/1-master-1-worker make clean
+```
 
 ## Building Kubernetes artifacts
 
@@ -162,7 +205,7 @@ Bringing machine 'kubernetes_worker' up with 'virtualbox' provider...
 0inputs+584outputs (0major+690067minor)pagefaults 0swaps
 ```
 
-After a couple of minutes or so, you can execute from your host directly:
+Now you can execute from your host directly:
 
 ```
 ~/p/kubernetes-cluster-vagrant (master) > kubectl get nodes
