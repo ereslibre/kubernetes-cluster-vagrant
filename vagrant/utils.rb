@@ -7,6 +7,7 @@ PACKAGES = %w(cri-tools kubeadm kubectl kubelet kubernetes-cni)
 IMAGES = %w(kube-apiserver kube-controller-manager kube-proxy kube-scheduler)
 MANIFESTS = %w(flannel)
 CONTAINER_IMAGES = JSON.parse File.read(File.join(File.dirname(__FILE__), '..', 'base-box', 'configs', 'container_images.json')), symbolize_names: true
+EXTRA_CONTAINER_IMAGES = JSON.parse(File.read(File.join(File.dirname(__FILE__), '..', 'base-box', 'configs', 'extra_container_images.json')), symbolize_names: true) rescue {}
 KUBERNETES_PATH = "#{ENV["GOPATH"]}/src/k8s.io/kubernetes"
 
 class KubernetesNetwork
@@ -81,16 +82,18 @@ class KubernetesMachine
 end
 
 def container_ref(name)
-  unless CONTAINER_IMAGES.include? name
-    return nil
+  unless CONTAINER_IMAGES.include?(name) || EXTRA_CONTAINER_IMAGES.include?(name)
+    raise "Unknown container image: #{name}"
   end
-  container_image = CONTAINER_IMAGES[name]
+  container_image = CONTAINER_IMAGES[name] || EXTRA_CONTAINER_IMAGES[name]
   result = ""
   if container_image[:repository] && !container_image[:repository].empty?
     result = "#{container_image[:repository]}/"
   end
   result += container_image[:name]
-  result += ":#{container_image[:tag]}"
+  if container_image[:tag] && !container_image[:tag].empty?
+    result += ":#{container_image[:tag]}"
+  end
   result
 end
 

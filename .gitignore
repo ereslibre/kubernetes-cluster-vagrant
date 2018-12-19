@@ -2,3 +2,4 @@
 *.log
 *.box
 /tmp
+/base-box/configs/extra_container_images.json

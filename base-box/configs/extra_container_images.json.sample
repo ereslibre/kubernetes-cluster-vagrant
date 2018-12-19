@@ -1,0 +1,11 @@
+{
+  "mariadb": {
+    "name": "mariadb"
+  },
+  "wordpress": {
+    "name": "wordpress"
+  },
+  "nginx": {
+    "name": "nginx"
+  }
+}

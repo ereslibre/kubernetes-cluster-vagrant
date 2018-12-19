@@ -27,6 +27,11 @@ dpkg -i <%= kubernetes_target_path %>/{<%= PACKAGES.join(",") %>}.deb
   docker pull <%= container_ref image %>
 <% end %>
 
+# Pull extra container images
+<% EXTRA_CONTAINER_IMAGES.each do |image, _| %>
+  docker pull <%= container_ref image %>
+<% end %>
+
 rm -rf <%= kubernetes_target_path %>
 
 # Disable some services by default
