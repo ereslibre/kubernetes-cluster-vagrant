@@ -11,7 +11,7 @@ sudo systemctl enable kubelet
   sudo kubeadm init --config <%= kubeadm_config_target_path "kubeadm.config" %>
   sudo cp /etc/kubernetes/admin.conf $HOME/.kube/config
 <% elsif machine.worker? %>
-  sudo kubeadm join <%= cluster.init_master.ip %>:6443 --token <%= cluster.token %> --discovery-token-unsafe-skip-ca-verification
+  sudo kubeadm join --config <%= kubeadm_config_target_path "kubeadm.config" %>
   sudo cp /etc/kubernetes/kubelet.conf $HOME/.kube/config
 <% end %>
 

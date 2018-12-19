@@ -1,0 +1,10 @@
+apiVersion: kubeadm.k8s.io/v1beta1
+kind: JoinConfiguration
+discovery:
+  bootstrapToken:
+    apiServerEndpoint: <%= cluster.init_master.ip %>:6443
+    token: <%= cluster.token %>
+    unsafeSkipCAVerification: true
+nodeRegistration:
+  kubeletExtraArgs:
+    node-ip: <%= machine.ip %>

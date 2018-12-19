@@ -7,7 +7,8 @@ bootstrapTokens:
   - token: <%= cluster.token %>
 nodeRegistration:
   kubeletExtraArgs:
-   pod-infra-container-image: <%= container_ref :pause %>
+    node-ip: <%= machine.ip %>
+    pod-infra-container-image: <%= container_ref :pause %>
 ---
 <% end %>
 apiVersion: kubeadm.k8s.io/v1beta1

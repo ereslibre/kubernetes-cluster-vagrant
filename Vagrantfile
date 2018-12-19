@@ -70,12 +70,17 @@ Vagrant.configure("2") do |config|
           end
         end
 
-        if machine.master? && up?
-          vm_config.vm.provision :file, source: template_file("configs/kubeadm.config.erb", binding), destination: kubeadm_config_target_path("kubeadm.config")
-        end
+        if up?
+          case machine.role
+          when "master"
+            vm_config.vm.provision :file, source: template_file("configs/kubeadm.config.erb", binding), destination: kubeadm_config_target_path("kubeadm.config")
+          when "worker"
+            vm_config.vm.provision :file, source: template_file("configs/kubeadm-join.config.erb", binding), destination: kubeadm_config_target_path("kubeadm.config")
+          end
 
-        if cluster.bootstrap && up?
-          vm_config.vm.provision :shell, inline: template("scripts/bootstrap.erb", binding), privileged: false
+          if cluster.bootstrap
+            vm_config.vm.provision :shell, inline: template("scripts/bootstrap.erb", binding), privileged: false
+          end
         end
       else
         raise "Unknown machine role: #{machine.role} on machine #{machine.name}"
