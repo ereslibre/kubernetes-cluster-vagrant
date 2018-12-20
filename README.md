@@ -307,8 +307,8 @@ profile. Example:
 <snip>
 
 >>> kubeconfig written to /home/ereslibre/.kube/config
-21.03user 11.47system 5:31.05elapsed 9%CPU (0avgtext+0avgdata 76264maxresident)k
-0inputs+1320outputs (0major+1679954minor)pagefaults 0swaps
+22.03user 12.93system 4:27.33elapsed 13%CPU (0avgtext+0avgdata 80360maxresident)k
+0inputs+1376outputs (0major+1914771minor)pagefaults 0swaps
 ```
 
 From your host, now you can run:
@@ -316,37 +316,37 @@ From your host, now you can run:
 ```
 ~/p/kubernetes-cluster-vagrant (master) > kubectl get nodes
 NAME      STATUS    ROLES     AGE       VERSION
-master1   Ready     master    3m46s     v1.14.0-alpha.0.756+51453a31317118
-master2   Ready     master    2m40s     v1.14.0-alpha.0.756+51453a31317118
-master3   Ready     master    92s       v1.14.0-alpha.0.756+51453a31317118
-worker    Ready     <none>    26s       v1.14.0-alpha.0.756+51453a31317118
+master1   Ready     master    3m4s      v1.14.0-alpha.0.1058+73b9effcb6dab5
+master2   Ready     master    2m17s     v1.14.0-alpha.0.1058+73b9effcb6dab5
+master3   Ready     master    68s       v1.14.0-alpha.0.1058+73b9effcb6dab5
+worker    Ready     <none>    11s       v1.14.0-alpha.0.1058+73b9effcb6dab5
 ```
 
 ```
 ~/p/kubernetes-cluster-vagrant (master) > kubectl get pods --all-namespaces -o wide
-NAMESPACE     NAME                              READY     STATUS    RESTARTS   AGE       IP           NODE      NOMINATED NODE   READINESS GATES
-kube-system   coredns-86c58d9df4-gj78t          1/1       Running   0          3m23s     10.244.0.2   master1   <none>           <none>
-kube-system   coredns-86c58d9df4-vvdm6          1/1       Running   0          3m23s     10.244.0.3   master1   <none>           <none>
-kube-system   etcd-master1                      1/1       Running   0          2m49s     10.0.2.15    master1   <none>           <none>
-kube-system   etcd-master2                      1/1       Running   0          2m38s     10.0.2.15    master2   <none>           <none>
-kube-system   etcd-master3                      1/1       Running   2          84s       10.0.2.15    master3   <none>           <none>
-kube-system   kube-apiserver-master1            1/1       Running   0          2m34s     10.0.2.15    master1   <none>           <none>
-kube-system   kube-apiserver-master2            1/1       Running   0          2m38s     10.0.2.15    master2   <none>           <none>
-kube-system   kube-apiserver-master3            1/1       Running   1          87s       10.0.2.15    master3   <none>           <none>
-kube-system   kube-controller-manager-master1   1/1       Running   0          2m38s     10.0.2.15    master1   <none>           <none>
-kube-system   kube-controller-manager-master2   1/1       Running   0          2m38s     10.0.2.15    master2   <none>           <none>
-kube-system   kube-controller-manager-master3   1/1       Running   0          85s       10.0.2.15    master3   <none>           <none>
-kube-system   kube-flannel-ds-amd64-7gv4p       1/1       Running   0          91s       10.0.2.15    master3   <none>           <none>
-kube-system   kube-flannel-ds-amd64-gj78r       1/1       Running   0          3m23s     10.0.2.15    master1   <none>           <none>
-kube-system   kube-flannel-ds-amd64-ljjjk       1/1       Running   1          2m38s     10.0.2.15    master2   <none>           <none>
-kube-system   kube-flannel-ds-amd64-vc9mn       1/1       Running   2          26s       10.0.2.15    worker    <none>           <none>
-kube-system   kube-proxy-6ffmq                  1/1       Running   0          91s       10.0.2.15    master3   <none>           <none>
-kube-system   kube-proxy-9wh8b                  1/1       Running   0          3m23s     10.0.2.15    master1   <none>           <none>
-kube-system   kube-proxy-p9hlr                  1/1       Running   0          2m38s     10.0.2.15    master2   <none>           <none>
-kube-system   kube-proxy-wm65p                  1/1       Running   0          26s       10.0.2.15    worker    <none>           <none>
-kube-system   kube-scheduler-master1            1/1       Running   0          2m43s     10.0.2.15    master1   <none>           <none>
-kube-system   kube-scheduler-master2            1/1       Running   0          2m38s     10.0.2.15    master2   <none>           <none>
-kube-system   kube-scheduler-master3            1/1       Running   0          86s       10.0.2.15    master3   <none>           <none>
+NAMESPACE     NAME                              READY     STATUS    RESTARTS   AGE       IP              NODE      NOMINATED NODE   READINESS GATES
+kube-system   coredns-86c58d9df4-bfdq6          1/1       Running   0          2m58s     10.244.0.3      master1   <none>           <none>
+kube-system   coredns-86c58d9df4-vsfjf          1/1       Running   0          2m58s     10.244.0.2      master1   <none>           <none>
+kube-system   etcd-master1                      1/1       Running   0          2m3s      172.28.128.21   master1   <none>           <none>
+kube-system   etcd-master2                      1/1       Running   3          2m27s     172.28.128.22   master2   <none>           <none>
+kube-system   etcd-master3                      1/1       Running   0          78s       172.28.128.23   master3   <none>           <none>
+kube-system   kube-apiserver-master1            1/1       Running   0          29s       172.28.128.21   master1   <none>           <none>
+kube-system   kube-apiserver-master2            1/1       Running   2          2m27s     172.28.128.22   master2   <none>           <none>
+kube-system   kube-apiserver-master3            1/1       Running   0          78s       172.28.128.23   master3   <none>           <none>
+kube-system   kube-controller-manager-master1   1/1       Running   1          2m5s      172.28.128.21   master1   <none>           <none>
+kube-system   kube-controller-manager-master2   1/1       Running   0          2m27s     172.28.128.22   master2   <none>           <none>
+kube-system   kube-controller-manager-master3   1/1       Running   0          78s       172.28.128.23   master3   <none>           <none>
+kube-system   kube-flannel-ds-amd64-2jgn4       1/1       Running   2          22s       172.28.128.24   worker    <none>           <none>
+kube-system   kube-flannel-ds-amd64-77nsm       1/1       Running   0          2m27s     172.28.128.22   master2   <none>           <none>
+kube-system   kube-flannel-ds-amd64-wzcbx       1/1       Running   0          74s       172.28.128.23   master3   <none>           <none>
+kube-system   kube-flannel-ds-amd64-zgnc5       1/1       Running   0          2m58s     172.28.128.21   master1   <none>           <none>
+kube-system   kube-proxy-9vz98                  1/1       Running   0          2m27s     172.28.128.22   master2   <none>           <none>
+kube-system   kube-proxy-h82kz                  1/1       Running   0          2m58s     172.28.128.21   master1   <none>           <none>
+kube-system   kube-proxy-j9n4c                  1/1       Running   0          22s       172.28.128.24   worker    <none>           <none>
+kube-system   kube-proxy-rc7nm                  1/1       Running   0          74s       172.28.128.23   master3   <none>           <none>
+kube-system   kube-scheduler-master1            1/1       Running   1          2m5s      172.28.128.21   master1   <none>           <none>
+kube-system   kube-scheduler-master2            1/1       Running   0          2m27s     172.28.128.22   master2   <none>           <none>
+kube-system   kube-scheduler-master3            1/1       Running   0          78s       172.28.128.23   master3   <none>           <none>
 ```
 
 A load balancer (haproxy) will be created, what will be the entry point for all

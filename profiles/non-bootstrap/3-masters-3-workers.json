@@ -1,6 +1,6 @@
 {
   "cluster": {
-    "name": "kubernetes_ha_nb",
+    "name": "kubernetes_ha_multiworker_nb",
     "network": {
       "pod_subnet": "10.244.0.0/16",
       "service_subnet": "10.96.0.0/12"
@@ -11,27 +11,37 @@
     {
       "name": "lb",
       "role": "loadbalancer",
-      "ip": "172.28.128.25"
+      "ip": "172.28.128.40"
     },
     {
       "name": "master1",
       "role": "master",
-      "ip": "172.28.128.26"
+      "ip": "172.28.128.41"
     },
     {
       "name": "master2",
       "role": "master",
-      "ip": "172.28.128.27"
+      "ip": "172.28.128.42"
     },
     {
       "name": "master3",
       "role": "master",
-      "ip": "172.28.128.28"
+      "ip": "172.28.128.43"
     },
     {
-      "name": "worker",
+      "name": "worker1",
       "role": "worker",
-      "ip": "172.28.128.29"
+      "ip": "172.28.128.44"
+    },
+    {
+      "name": "worker2",
+      "role": "worker",
+      "ip": "172.28.128.45"
+    },
+    {
+      "name": "worker3",
+      "role": "worker",
+      "ip": "172.28.128.46"
     }
   ]
 }

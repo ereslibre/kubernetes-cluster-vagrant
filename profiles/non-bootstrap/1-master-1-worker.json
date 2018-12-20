@@ -1,6 +1,6 @@
 {
   "cluster": {
-    "name": "kubernetes",
+    "name": "kubernetes_nb",
     "network": {
       "pod_subnet": "10.244.0.0/16",
       "service_subnet": "10.96.0.0/12"
@@ -11,12 +11,12 @@
     {
       "name": "master",
       "role": "master",
-      "ip": "172.28.128.3"
+      "ip": "172.28.128.5"
     },
     {
       "name": "worker",
       "role": "worker",
-      "ip": "172.28.128.4"
+      "ip": "172.28.128.6"
     }
   ]
 }
