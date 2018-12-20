@@ -10,6 +10,13 @@ nodeRegistration:
     node-ip: <%= machine.ip %>
     pod-infra-container-image: <%= container_ref :pause %>
 ---
+<% elsif machine.master? %>
+apiVersion: kubeadm.k8s.io/v1beta1
+kind: InitConfiguration
+nodeRegistration:
+  kubeletExtraArgs:
+    node-ip: <%= machine.ip %>
+---
 <% end %>
 apiVersion: kubeadm.k8s.io/v1beta1
 kind: ClusterConfiguration
