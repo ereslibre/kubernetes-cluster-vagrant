@@ -52,3 +52,8 @@ destroy:
 .PHONY: clean
 clean: destroy
 	@docker rm -f -v kubernetes-build &> /dev/null || true
+
+.PHONY: full-clean
+full-clean: clean
+	$(MAKE) -C base-box clean
+	$(MAKE) -C kubernetes-build clean

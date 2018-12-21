@@ -1,11 +1,14 @@
 {
   "mariadb": {
-    "name": "mariadb"
+    "name": "mariadb",
+    "tag": "10"
   },
   "wordpress": {
-    "name": "wordpress"
+    "name": "wordpress",
+    "tag": "5"
   },
   "nginx": {
-    "name": "nginx"
+    "name": "nginx",
+    "tag": "1"
   }
 }
