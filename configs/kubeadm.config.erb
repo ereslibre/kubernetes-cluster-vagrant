@@ -13,6 +13,8 @@ nodeRegistration:
 <% elsif machine.master? %>
 apiVersion: kubeadm.k8s.io/v1beta1
 kind: InitConfiguration
+localAPIEndpoint:
+  advertiseAddress: <%= machine.advertise_address %>
 nodeRegistration:
   kubeletExtraArgs:
     node-ip: <%= machine.ip %>
