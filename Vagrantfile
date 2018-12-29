@@ -58,8 +58,13 @@ Vagrant.configure("2") do |config|
           vm_config.vm.provision :file, source: image_path(image), destination: kubernetes_target_path("#{image}.tar")
         end
 
+        # Install custom container images (referenced by their full path in the host filesystem)
+        custom_container_images.each do |image_path|
+          vm_config.vm.provision :file, source: image_path, destination: custom_container_image_target_path(image_path)
+        end
+
         # Perform the packages and container images installation
-        unless packages.empty? && images.empty?
+        unless packages.empty? && images.empty? && custom_container_images.empty?
           vm_config.vm.provision :shell, inline: template("scripts/install.erb", binding)
         end
 
@@ -81,6 +86,14 @@ Vagrant.configure("2") do |config|
           if cluster.bootstrap
             vm_config.vm.provision :shell, inline: template("scripts/bootstrap.erb", binding), privileged: false
           end
+        end
+
+        # Install custom manifests
+        if machine.init_master? && !custom_manifests.empty?
+          custom_manifests.each do |manifest_path|
+            vm_config.vm.provision :file, source: manifest_path, destination: custom_manifests_target_path(manifest_path)
+          end
+          vm_config.vm.provision :shell, inline: template("scripts/install-custom-manifests.erb", binding), privileged: false
         end
       else
         raise "Unknown machine role: #{machine.role} on machine #{machine.name}"

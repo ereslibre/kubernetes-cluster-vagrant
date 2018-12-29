@@ -7,4 +7,10 @@
   docker tag k8s.gcr.io/<%= image %>:<%= full_image_version image %> k8s.gcr.io/<%= image %>:<%= image_version image %>
 <% end %>
 
-chmod -R +w <%= kubernetes_target_path %>
+<% custom_container_images.each do |image_path| %>
+  docker load -i <%= custom_container_image_target_path image_path %>
+<% end %>
+
+if [ -d <%= kubernetes_target_path %> ]; then
+  chmod -R +w <%= kubernetes_target_path %>
+fi
