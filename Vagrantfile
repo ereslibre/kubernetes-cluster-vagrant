@@ -86,14 +86,6 @@ Vagrant.configure("2") do |config|
             vm_config.vm.provision :shell, inline: template("scripts/bootstrap.erb", binding), privileged: false
           end
         end
-
-        # Install custom manifests
-        if machine.init_master? && !custom_manifests.empty?
-          custom_manifests.each do |manifest_path|
-            vm_config.vm.provision :file, source: manifest_path, destination: custom_manifests_target_path(manifest_path)
-          end
-          vm_config.vm.provision :shell, inline: template("scripts/install-custom-manifests.erb", binding), privileged: false
-        end
       else
         raise "Unknown machine role: #{machine.role} on machine #{machine.name}"
       end

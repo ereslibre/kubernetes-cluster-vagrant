@@ -139,10 +139,6 @@ def custom_container_image_target_path(image_path)
   File.join "/home/vagrant/custom/images", File.basename(image_path)
 end
 
-def custom_manifests_target_path(manifest_path)
-  File.join "/home/vagrant/custom/manifests", File.basename(manifest_path)
-end
-
 def template_file(config, b)
   template = Tempfile.new
   template.write template(config, b)
@@ -180,10 +176,6 @@ end
 
 def custom_container_images
   (ENV["CUSTOM_CONTAINER_IMAGES"] || "").split(",")
-end
-
-def custom_manifests
-  (ENV["CUSTOM_MANIFESTS"] || "").split(",")
 end
 
 def default_manifests(cluster)
