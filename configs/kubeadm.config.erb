@@ -1,4 +1,3 @@
-<% if machine.init_master? %>
 apiVersion: kubeadm.k8s.io/v1beta1
 kind: InitConfiguration
 localAPIEndpoint:
@@ -10,16 +9,6 @@ nodeRegistration:
     node-ip: <%= machine.ip %>
     pod-infra-container-image: <%= container_ref :pause %>
 ---
-<% elsif machine.master? %>
-apiVersion: kubeadm.k8s.io/v1beta1
-kind: InitConfiguration
-localAPIEndpoint:
-  advertiseAddress: <%= machine.advertise_address %>
-nodeRegistration:
-  kubeletExtraArgs:
-    node-ip: <%= machine.ip %>
----
-<% end %>
 apiVersion: kubeadm.k8s.io/v1beta1
 kind: ClusterConfiguration
 kubernetesVersion: <%= kubernetes_version %>
@@ -31,7 +20,6 @@ apiServer:
 controlPlaneEndpoint: <%= cluster.lb.ip %>:6443
 <% end %>
 networking:
-  dnsDomain: cluster.local
   podSubnet: <%= cluster.network.pod_subnet %>
   serviceSubnet: <%= cluster.network.service_subnet %>
 dns:
@@ -41,21 +29,3 @@ etcd:
   local:
     imageRepository: <%= CONTAINER_IMAGES[:etcd][:repository] %>
     imageTag: <%= CONTAINER_IMAGES[:etcd][:tag] %>
-<% if cluster.ha? %>
-    extraArgs:
-      name: <%= machine.name %>
-      listen-client-urls: "https://127.0.0.1:2379,https://<%= machine.ip %>:2379"
-      advertise-client-urls: "https://<%= machine.ip %>:2379"
-      listen-peer-urls: "https://<%= machine.ip %>:2380"
-      initial-advertise-peer-urls: "https://<%= machine.ip %>:2380"
-      initial-cluster: "<%= machine.etcd_initial_cluster_endpoints %>"
-      <% unless machine.init_master? %>
-      initial-cluster-state: existing
-      <% end %>
-    serverCertSANs:
-      - <%= machine.name %>
-      - <%= machine.ip %>
-    peerCertSANs:
-      - <%= machine.name %>
-      - <%= machine.ip %>
-<% end %>

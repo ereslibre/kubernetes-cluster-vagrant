@@ -8,3 +8,8 @@ discovery:
 nodeRegistration:
   kubeletExtraArgs:
     node-ip: <%= machine.ip %>
+<% if machine.master? %>
+controlPlane:
+  localAPIEndpoint:
+    advertiseAddress: <%= machine.advertise_address %>
+<% end %>

@@ -75,10 +75,9 @@ Vagrant.configure("2") do |config|
         end
 
         if up?
-          case machine.role
-          when "master"
+          if machine.init_master?
             vm_config.vm.provision :file, source: template_file("configs/kubeadm.config.erb", binding), destination: kubeadm_config_target_path("kubeadm.config")
-          when "worker"
+          else
             vm_config.vm.provision :file, source: template_file("configs/kubeadm-join.config.erb", binding), destination: kubeadm_config_target_path("kubeadm.config")
           end
 

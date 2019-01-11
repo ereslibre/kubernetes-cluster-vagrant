@@ -7,21 +7,15 @@ sudo systemctl enable kubelet
   sudo mv /tmp/kubernetes/* /etc/kubernetes
 <% end %>
 
-<% if machine.master? %>
+<% if machine.init_master? %>
   sudo kubeadm init --config <%= kubeadm_config_target_path "kubeadm.config" %>
   sudo cp /etc/kubernetes/admin.conf $HOME/.kube/config
-<% elsif machine.worker? %>
+<% else %>
   sudo kubeadm join --config <%= kubeadm_config_target_path "kubeadm.config" %>
   sudo cp /etc/kubernetes/kubelet.conf $HOME/.kube/config
 <% end %>
 
 sudo chown $(id -u):$(id -g) $HOME/.kube/config
-
-<% if !machine.init_master? && machine.master? %>
-  while ! kubectl exec -n kube-system etcd-<%= cluster.init_master.name %> -- etcdctl --ca-file /etc/kubernetes/pki/etcd/ca.crt --cert-file /etc/kubernetes/pki/etcd/peer.crt --key-file /etc/kubernetes/pki/etcd/peer.key --endpoints=https://<%= cluster.init_master.ip %>:2379 member add <%= machine.name %> https://<%= machine.ip %>:2380 &> /dev/null; do
-    sleep 1
-  done
-<% end %>
 
 <% if cluster.ha? && machine.init_master? %>
   mkdir -p /vagrant/pki/etcd
