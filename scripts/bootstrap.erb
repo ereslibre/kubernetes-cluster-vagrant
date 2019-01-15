@@ -2,17 +2,18 @@ mkdir -p $HOME/.kube
 
 sudo systemctl enable kubelet
 
-<% if cluster.ha? && !machine.init_master? && machine.master? %>
+<% if machine.secondary_master? %>
   sudo mkdir -p /etc/kubernetes
-  sudo mv /tmp/kubernetes/* /etc/kubernetes
+  sudo cp -r /vagrant/pki /etc/kubernetes
 <% end %>
 
 <% if machine.init_master? %>
   sudo kubeadm init --config <%= kubeadm_config_target_path "kubeadm.config" %>
   sudo cp /etc/kubernetes/admin.conf $HOME/.kube/config
+  sudo cp /etc/kubernetes/admin.conf /vagrant
 <% else %>
   sudo kubeadm join --config <%= kubeadm_config_target_path "kubeadm.config" %>
-  sudo cp /etc/kubernetes/kubelet.conf $HOME/.kube/config
+  sudo cp /vagrant/admin.conf $HOME/.kube/config
 <% end %>
 
 sudo chown $(id -u):$(id -g) $HOME/.kube/config
@@ -23,7 +24,6 @@ sudo chown $(id -u):$(id -g) $HOME/.kube/config
   sudo cp /etc/kubernetes/pki/{ca,sa,front-proxy-ca}.key /vagrant/pki
   sudo cp /etc/kubernetes/pki/sa.pub /vagrant/pki
   sudo cp /etc/kubernetes/pki/etcd/ca.{crt,key} /vagrant/pki/etcd
-  sudo cp /etc/kubernetes/admin.conf /vagrant
 <% end %>
 
 <% if machine.init_master? %>

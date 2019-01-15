@@ -1,6 +1,7 @@
 {
   "cluster": {
     "name": "kubernetes_nb",
+    "token": "5ynki1.3erp9i3yo7gqg1nv",
     "network": {
       "pod_subnet": "10.244.0.0/16",
       "service_subnet": "10.96.0.0/12"

@@ -2,7 +2,7 @@ KUBEPATH = $(GOPATH)/src/k8s.io/kubernetes
 KUBERNETES_BUILD_CONTAINER = docker ps --filter=name=kubernetes-build -q
 
 .PHONY: all
-all: up kubeconfig
+all: up instructions kubeconfig
 
 .PHONY: base-box
 base-box:
@@ -14,9 +14,11 @@ up: base-box
 
 .PHONY: kubeconfig
 kubeconfig:
-	@mkdir -p ~/.kube
-	@vagrant ssh $(shell ruby -I vagrant -r utils -e 'print cluster.init_master.full_name') -c 'sudo cat /etc/kubernetes/admin.conf' > ~/.kube/config 2>/dev/null
-	@echo ">>> kubeconfig written to $(HOME)/.kube/config"
+	@scripts/fetch-kubeconfig.sh
+
+.PHONY: instructions
+instructions:
+	@ruby -I vagrant -r utils -e 'cluster.instructions' 2> /dev/null
 
 .PHONY: reset
 reset:

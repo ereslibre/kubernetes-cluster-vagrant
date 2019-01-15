@@ -44,6 +44,30 @@ class KubernetesCluster
   def ha?
     masters.length > 1
   end
+
+  def instructions
+    puts
+    puts "Cluster information:"
+    puts "  Name: #{name}"
+    puts "  Automatic bootstrap: #{cluster.bootstrap ? "Yes" : "No"}"
+    puts "  HA: #{cluster.ha? ? "Yes" : "No"}"
+    if cluster.ha?
+      puts "    Load balancer: #{lb.ip}"
+    end
+    puts "  SSH instructions for each machine:"
+    machines.each do |machine|
+      machine.ssh_instructions
+    end
+    if !cluster.bootstrap
+      puts
+      puts "Your configuration specifies that no automatic bootstrap should take"
+      puts "place, so you should SSH into all machines (except the load balancer)"
+      puts 'and bootstrap them. A file `bootstrap.sh` has been placed in all of them'
+      puts 'to make it easier for you to see what the bootstrap would have ran,'
+      puts 'and you can optionally run them too if you want.'
+    end
+    puts
+  end
 end
 
 class KubernetesMachine
@@ -70,14 +94,17 @@ class KubernetesMachine
     @cluster.init_master == self
   end
 
+  def secondary_master?
+    master? && !init_master?
+  end
+
   def full_name
     "#{@cluster.name}_#{@name}"
   end
 
-  def etcd_initial_cluster_endpoints
-    (@cluster.masters.take_while { |master| master != self } + [self]).map do |m|
-      "#{m.name}=https://#{m.ip}:2380"
-    end.join(",")
+  def ssh_instructions
+    puts "    - #{full_name} (#{role})"
+    puts "        PROFILE=#{ENV["PROFILE"]} vagrant ssh #{full_name}"
   end
 end
 
@@ -137,6 +164,14 @@ end
 
 def custom_container_image_target_path(image_path)
   File.join "/home/vagrant/custom/images", File.basename(image_path)
+end
+
+def home_path(path = nil)
+  if path.nil?
+    "/home/vagrant"
+  else
+    "/home/vagrant/#{path}"
+  end
 end
 
 def template_file(config, b)
