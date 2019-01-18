@@ -4,6 +4,9 @@
 require 'fileutils'
 require File.join(File.dirname(__FILE__), 'vagrant', 'utils')
 
+MASTER_RAM = ENV["MASTER_RAM"].nil? ? 1024 : ENV["MASTER_RAM"].to_i
+WORKER_RAM = ENV["WORKER_RAM"].nil? ? 1024 : ENV["WORKER_RAM"].to_i
+
 check_profile
 
 if provisioning?
@@ -28,6 +31,12 @@ Vagrant.configure("2") do |config|
       end
 
       vm_config.vm.provider "virtualbox" do |vb|
+        case machine.role
+        when "master"
+          vb.memory = MASTER_RAM
+        when "worker"
+          vb.memory = WORKER_RAM
+        end
         vb.customize ["modifyvm", :id, "--audio", "none"]
         vb.linked_clone = true
       end
