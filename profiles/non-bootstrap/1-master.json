@@ -1,0 +1,18 @@
+{
+  "cluster": {
+    "name": "kubernetes_1_master_nb",
+    "token": "5ynki1.3erp9i3yo7gqg1nv",
+    "network": {
+      "pod_subnet": "10.244.0.0/16",
+      "service_subnet": "10.96.0.0/12"
+    },
+    "bootstrap": false
+  },
+  "machines": [
+    {
+      "name": "master",
+      "role": "master",
+      "ip": "172.28.128.61"
+    }
+  ]
+}
