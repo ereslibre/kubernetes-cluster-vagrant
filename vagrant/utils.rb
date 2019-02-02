@@ -49,16 +49,16 @@ class KubernetesCluster
     puts
     puts "Cluster information:"
     puts "  Name: #{name}"
-    puts "  Automatic bootstrap: #{cluster.bootstrap ? "Yes" : "No"}"
-    puts "  HA: #{cluster.ha? ? "Yes" : "No"}"
-    if cluster.ha?
+    puts "  Automatic bootstrap: #{bootstrap ? "Yes" : "No"}"
+    puts "  HA: #{ha? ? "Yes" : "No"}"
+    if ha?
       puts "    Load balancer: #{lb.ip}"
     end
     puts "  SSH instructions for each machine:"
     machines.each do |machine|
       machine.ssh_instructions
     end
-    if !cluster.bootstrap
+    if !bootstrap
       puts
       puts "Your configuration specifies that no automatic bootstrap should take"
       puts "place, so you should SSH into all machines (except the load balancer)"
