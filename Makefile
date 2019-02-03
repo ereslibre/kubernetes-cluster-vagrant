@@ -45,6 +45,10 @@ artifacts: debs images
 shell: run
 	docker exec -it $(shell $(KUBERNETES_BUILD_CONTAINER)) su -c "cd $(KUBEPATH) && bash" - $(shell id -u -n)
 
+.PHONY: bazel
+bazel: run
+	docker exec -it $(shell $(KUBERNETES_BUILD_CONTAINER)) su -c "cd $(KUBEPATH) && bazel $(WHAT)" - $(shell id -u -n)
+
 .PHONY: destroy
 destroy:
 	@vagrant destroy -f &> /dev/null || true

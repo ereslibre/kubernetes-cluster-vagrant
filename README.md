@@ -10,6 +10,7 @@
 * [HA deployments (multi master)](#ha-deployments-multi-master)
 * [SSH'ing into the machines](#sshing-into-the-machines)
 * [Destroying the cluster](#destroying-the-cluster)
+* [Executing any bazel target](#executing-any-bazel-target)
 * [License](#license)
 
 ## What
@@ -399,6 +400,14 @@ artifacts.
 
 If you want to destroy the cluster, but keep the docker container for building
 Kubernetes artifacts faster, you can run `make destroy`.
+
+## Executing any bazel target
+
+It's possible to call any bazel task within the Kubernetes build container, like:
+
+```
+make bazel WHAT="test //cmd/kubeadm/..."
+```
 
 ## License
 
