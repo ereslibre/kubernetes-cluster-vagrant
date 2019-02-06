@@ -2,17 +2,17 @@
   "coredns": {
     "repository": "k8s.gcr.io",
     "name": "coredns",
-    "tag": "1.2.6"
+    "tag": "1.3.1"
   },
   "etcd": {
     "repository": "k8s.gcr.io",
     "name": "etcd",
-    "tag": "3.2.24"
+    "tag": "3.3.10"
   },
   "flannel": {
     "repository": "quay.io",
     "name": "coreos/flannel",
-    "tag": "v0.10.0-amd64"
+    "tag": "v0.11.0-amd64"
   },
   "pause": {
     "repository": "k8s.gcr.io",
