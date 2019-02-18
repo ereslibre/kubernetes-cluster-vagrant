@@ -1,5 +1,5 @@
-<% packages.each do |package| %>
-  dpkg -i <%= kubernetes_target_path package %>.deb
+<% if !packages.empty? %>
+  dpkg -i <%= packages.map { |package| kubernetes_target_path "#{package}.deb" }.join(" ") %>
 <% end %>
 
 <% images.each do |image| %>
