@@ -49,6 +49,11 @@ shell: run
 bazel: run
 	docker exec -it $(shell $(KUBERNETES_BUILD_CONTAINER)) su -c "cd $(KUBEPATH) && bazel $(WHAT)" - $(shell id -u -n)
 
+.PHONY: kubeadm-e2e
+kubeadm-e2e:
+	$(MAKE) bazel WHAT="build //vendor/github.com/onsi/ginkgo/ginkgo //test/e2e_kubeadm:e2e_kubeadm.test"
+	KUBECONFIG=$(HOME)/.kube/config $(KUBEPATH)/bazel-bin/test/e2e_kubeadm/e2e_kubeadm.test
+
 .PHONY: destroy
 destroy:
 	@vagrant destroy -f &> /dev/null || true
@@ -58,11 +63,6 @@ destroy:
 .PHONY: clean
 clean: destroy
 	@docker rm -f -v kubernetes-build &> /dev/null || true
-
-.PHONY: kubeadm-e2e
-kubeadm-e2e:
-	$(MAKE) bazel WHAT="build //vendor/github.com/onsi/ginkgo/ginkgo //test/e2e_kubeadm:e2e_kubeadm.test"
-	KUBECONFIG=$(HOME)/.kube/config $(KUBEPATH)/bazel-bin/test/e2e_kubeadm/e2e_kubeadm.test
 
 .PHONY: full-clean
 full-clean: clean
