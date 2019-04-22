@@ -8,7 +8,7 @@ sudo systemctl enable kubelet
 <% end %>
 
 <% if machine.init_master? %>
-  sudo kubeadm init --config <%= kubeadm_config_target_path "kubeadm.config" %>
+  sudo kubeadm init --experimental-upload-certs --config <%= kubeadm_config_target_path "kubeadm.config" %>
   sudo cp /etc/kubernetes/admin.conf $HOME/.kube/config
   sudo cp /etc/kubernetes/admin.conf /vagrant
 <% else %>
