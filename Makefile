@@ -59,6 +59,11 @@ destroy:
 clean: destroy
 	@docker rm -f -v kubernetes-build &> /dev/null || true
 
+.PHONY: kubeadm-e2e
+kubeadm-e2e:
+	$(MAKE) bazel WHAT="build //vendor/github.com/onsi/ginkgo/ginkgo //test/e2e_kubeadm:e2e_kubeadm.test"
+	env KUBECONFIG=$(HOME)/.kube/config $(KUBEPATH)/bazel-bin/test/e2e_kubeadm/e2e_kubeadm.test
+
 .PHONY: full-clean
 full-clean: clean
 	$(MAKE) -C base-box clean
