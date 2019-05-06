@@ -125,15 +125,23 @@ def container_ref(name)
 end
 
 def kubernetes_path(path)
-  "#{KUBERNETES_PATH}/#{path}"
+  File.join KUBERNETES_PATH, path
 end
 
 def package_path(package)
-  kubernetes_path "bazel-bin/build/debs/#{package}.deb"
+  if ENV["PACKAGE_PATH"].nil?
+    kubernetes_path "bazel-bin/build/debs/#{package}.deb"
+  else
+    File.join ENV["PACKAGE_PATH"], "#{package}.deb"
+  end
 end
 
 def image_path(image)
-  kubernetes_path "bazel-bin/build/#{image}.tar"
+  if ENV["IMAGE_PATH"].nil?
+    kubernetes_path "bazel-bin/build/#{image}.tar"
+  else
+    File.join ENV["IMAGE_PATH"], "#{image}.tar"
+  end
 end
 
 def full_image_version(image)
