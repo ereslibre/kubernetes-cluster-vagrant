@@ -4,6 +4,8 @@
 require 'fileutils'
 require File.join(File.dirname(__FILE__), 'vagrant', 'utils')
 
+MASTER_CPUS = ENV["MASTER_CPUS"].nil? ? 2 : ENV["MASTER_CPUS"].to_i
+WORKER_CPUS = ENV["WORKER_CPUS"].nil? ? 2 : ENV["WORKER_CPUS"].to_i
 MASTER_RAM = ENV["MASTER_RAM"].nil? ? 1024 : ENV["MASTER_RAM"].to_i
 WORKER_RAM = ENV["WORKER_RAM"].nil? ? 1024 : ENV["WORKER_RAM"].to_i
 
@@ -33,8 +35,10 @@ Vagrant.configure("2") do |config|
       vm_config.vm.provider "virtualbox" do |vb|
         case machine.role
         when "master"
+          vb.cpus = MASTER_CPUS
           vb.memory = MASTER_RAM
         when "worker"
+          vb.cpus = WORKER_CPUS
           vb.memory = WORKER_RAM
         end
         vb.customize ["modifyvm", :id, "--audio", "none"]
